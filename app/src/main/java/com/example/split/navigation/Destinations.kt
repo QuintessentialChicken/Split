@@ -1,13 +1,11 @@
 package com.example.split.navigation
 
-interface Destinations {
-    val title: String
-    val route: String
-}
+import androidx.navigation3.runtime.NavKey
+import kotlinx.serialization.Serializable
 
-object Home : Destinations {
-    override val route: String
-        get() = "home_route"
-    override val title: String
-        get() = "Home"
-}
+@Serializable
+data object Home: NavKey
+
+
+@Serializable
+data object Test: NavKey
