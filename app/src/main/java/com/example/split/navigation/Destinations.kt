@@ -5,9 +5,23 @@ interface Destinations {
     val route: String
 }
 
-object Home : Destinations {
+object Groups : Destinations {
     override val route: String
-        get() = "home_route"
+        get() = "groups_route"
     override val title: String
-        get() = "Home"
+        get() = "Groups"
+}
+
+object Friends : Destinations {
+    override val route: String
+        get() = "friends_route"
+    override val title: String
+        get() = "Friends"
+}
+
+object Account : Destinations {
+    override val route: String
+        get() = "account_route"
+    override val title: String
+        get() = "Account"
 }

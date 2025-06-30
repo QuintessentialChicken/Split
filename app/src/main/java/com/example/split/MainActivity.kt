@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -13,8 +14,10 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
-import com.example.split.navigation.Home
+import com.example.split.navigation.Groups
 import com.example.split.navigation.setupNavGraph
+import com.example.split.ui.components.BottomBar
+import com.example.split.ui.components.TopBar
 import com.example.split.ui.theme.SplitTheme
 
 class MainActivity : ComponentActivity() {
@@ -25,10 +28,19 @@ class MainActivity : ComponentActivity() {
             SplitTheme {
                 val appState = rememberAppState()
 
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+                Scaffold(
+                    modifier = Modifier.fillMaxSize(),
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    topBar = {
+                        TopBar(
+                            appState
+                        ) { route -> appState.navigate(route) }
+                    },
+                    bottomBar = { BottomBar(appState) }
+                ) { innerPadding ->
                     NavHost(
                         navController = appState.navController,
-                        startDestination = Home.route,
+                        startDestination = Groups.route,
                         modifier = Modifier.padding(innerPadding)
                     ) {
                         setupNavGraph(appState)
