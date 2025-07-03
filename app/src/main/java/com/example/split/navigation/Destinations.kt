@@ -25,3 +25,10 @@ object Account : Destinations {
     override val title: String
         get() = "Account"
 }
+
+object Expenses : Destinations {
+    override val route: String
+        get() = "expenses_route"
+    override val title: String
+        get() = "Expenses"
+}
