@@ -30,7 +30,6 @@ fun NavGraphBuilder.setupNavGraph(
     }
 
     composable(Expenses.route) {
-        appState.fabState.value = FabState(Icons.Filled.Add, contentDescription = "Add Expense", onClick = { })
-        ExpensesScreen()
+        ExpensesScreen(setFab = { appState.fabState.value = it })
     }
 }
