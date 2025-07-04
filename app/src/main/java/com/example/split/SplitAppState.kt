@@ -1,6 +1,7 @@
 package com.example.split
 
 import android.util.Log
+import androidx.compose.material3.TopAppBarState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavHostController
@@ -11,6 +12,7 @@ class SplitAppState (
     val navController: NavHostController,
 ) {
     val fabState = mutableStateOf<FabState?>(null)
+    val topBarState = mutableStateOf<TopBarState?>(null)
     var currentScreen: Destinations = Groups
 
     fun navigate(route: String) {
@@ -40,3 +42,6 @@ data class FabState(
     val onClick: () -> Unit
 )
 
+data class TopBarState(
+    var title: String,
+)

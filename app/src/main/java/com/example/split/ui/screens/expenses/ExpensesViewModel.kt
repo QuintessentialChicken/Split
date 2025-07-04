@@ -21,4 +21,10 @@ class ExpensesViewModel() : ViewModel() {
             println(_currentState)
         }
 
+    fun handleBackPress() {
+        when (_currentState) {
+            State.ADD -> _currentState = State.HOME
+            State.HOME -> {}
+        }
+    }
 }
