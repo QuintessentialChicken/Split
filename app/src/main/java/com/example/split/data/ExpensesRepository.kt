@@ -1,7 +1,6 @@
 package com.example.split.data
 
 import com.example.split.services.StorageService
-import com.example.split.services.impl.RoomStorageServiceImpl
 import javax.inject.Inject
 
 class ExpensesRepository @Inject constructor(

@@ -33,6 +33,11 @@ import androidx.compose.material3.TopAppBarColors
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -62,6 +67,11 @@ fun ExpensesScreen(
     }
 
     BackHandler { viewModel.handleBackPress() }
+
+
+
+
+
     Column (
         modifier
             .fillMaxSize()
@@ -94,6 +104,8 @@ fun ExpensesScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddExpense(modifier: Modifier = Modifier) {
+    var description by remember { mutableStateOf("Description") }
+    var amount by remember { mutableStateOf(0.00) }
     FlowRow(
         modifier = modifier.padding(bottom = 20.dp),
         itemVerticalAlignment = Alignment.CenterVertically,
@@ -102,8 +114,8 @@ fun AddExpense(modifier: Modifier = Modifier) {
         Text("Mit dir und: ")
         InputChip(selected = true, onClick = {}, label = { Text("Paula") })
     }
-    TextField(modifier = modifier.fillMaxWidth().padding(horizontal = 30.dp, vertical = 5.dp), value = "Name", onValueChange = {})
-    TextField(modifier = modifier.fillMaxWidth().padding(horizontal = 30.dp, vertical = 5.dp), value = "0,00", onValueChange = {})
+    TextField(modifier = modifier.fillMaxWidth().padding(horizontal = 30.dp, vertical = 5.dp), value = description, onValueChange = {})
+    TextField(modifier = modifier.fillMaxWidth().padding(horizontal = 30.dp, vertical = 5.dp), value = amount.toString(), onValueChange = {})
     Button(
         modifier = modifier.fillMaxWidth().padding(horizontal = 50.dp, vertical = 5.dp),
         onClick = {}

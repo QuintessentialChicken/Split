@@ -4,14 +4,19 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import com.example.split.data.ExpensesRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
 enum class State {
     HOME,
     ADD
 }
 
-class ExpensesViewModel() : ViewModel() {
+@HiltViewModel
+class ExpensesViewModel @Inject constructor(
+    private val repository: ExpensesRepository
+) : ViewModel() {
 
     private var _currentState by mutableStateOf(State.HOME)
     var currentState: State
@@ -27,4 +32,6 @@ class ExpensesViewModel() : ViewModel() {
             State.HOME -> {}
         }
     }
+
+
 }
