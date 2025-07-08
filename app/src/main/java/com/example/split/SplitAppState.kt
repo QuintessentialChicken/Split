@@ -44,4 +44,5 @@ data class FabState(
 
 data class TopBarState(
     var title: String,
+    var action: () -> Unit = { println("NULLINGER?")}
 )

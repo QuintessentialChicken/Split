@@ -65,9 +65,14 @@ class MainActivity : ComponentActivity() {
                                     }
                                 },
                                 actions = {
-                                    IconButton(onClick = {}) {
-                                        Icon(Icons.Filled.Done, contentDescription = "Done")
-                                    }
+                                    IconButton(onClick = { println("BLABL") }) {
+                                            Icon(Icons.Filled.Done, contentDescription = "Done")
+                                        }
+//                                    appState.topBarState.value?.let { state ->
+//                                        IconButton(onClick = { state.action }) {
+//                                            Icon(Icons.Filled.Done, contentDescription = "Done")
+//                                        }
+//                                    }
                                 }
                             )
                         } ?: CenterAlignedTopAppBar(

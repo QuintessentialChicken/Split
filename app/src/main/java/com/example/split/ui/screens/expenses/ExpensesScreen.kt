@@ -34,6 +34,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -94,7 +95,7 @@ fun ExpensesScreen(
             }
 
             State.ADD -> {
-                setTopBar(TopBarState("Add Expense"))
+                setTopBar(TopBarState("Add Expense") { viewModel.confirmAdd() })
                 AddExpense()
             }
         }
@@ -105,7 +106,7 @@ fun ExpensesScreen(
 @Composable
 fun AddExpense(modifier: Modifier = Modifier) {
     var description by remember { mutableStateOf("Description") }
-    var amount by remember { mutableStateOf(0.00) }
+    var amount by remember { mutableDoubleStateOf(0.00) }
     FlowRow(
         modifier = modifier.padding(bottom = 20.dp),
         itemVerticalAlignment = Alignment.CenterVertically,
@@ -114,10 +115,16 @@ fun AddExpense(modifier: Modifier = Modifier) {
         Text("Mit dir und: ")
         InputChip(selected = true, onClick = {}, label = { Text("Paula") })
     }
-    TextField(modifier = modifier.fillMaxWidth().padding(horizontal = 30.dp, vertical = 5.dp), value = description, onValueChange = {})
-    TextField(modifier = modifier.fillMaxWidth().padding(horizontal = 30.dp, vertical = 5.dp), value = amount.toString(), onValueChange = {})
+    TextField(modifier = modifier
+        .fillMaxWidth()
+        .padding(horizontal = 30.dp, vertical = 5.dp), value = description, onValueChange = {})
+    TextField(modifier = modifier
+        .fillMaxWidth()
+        .padding(horizontal = 30.dp, vertical = 5.dp), value = amount.toString(), onValueChange = {})
     Button(
-        modifier = modifier.fillMaxWidth().padding(horizontal = 50.dp, vertical = 5.dp),
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 50.dp, vertical = 5.dp),
         onClick = {}
     ) { Text("Gezahlt von dir und gleichmäßig geteilt")}
 }

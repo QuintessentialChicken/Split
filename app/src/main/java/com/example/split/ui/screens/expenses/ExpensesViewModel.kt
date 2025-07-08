@@ -33,5 +33,9 @@ class ExpensesViewModel @Inject constructor(
         }
     }
 
+    fun confirmAdd() {
+        println("CONFIRMRMRMRMMRMR")
+    }
+
 
 }
