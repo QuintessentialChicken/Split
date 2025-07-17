@@ -54,6 +54,7 @@ dependencies {
     implementation(libs.room.ktx)
     ksp(libs.hilt.compiler)
     ksp(libs.room.compiler)
+    implementation(libs.androidx.material.icons.extended)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

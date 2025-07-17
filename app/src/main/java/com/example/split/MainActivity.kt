@@ -58,25 +58,26 @@ class MainActivity : ComponentActivity() {
                     topBar = {
                         appState.topBarState.value?.let { state ->
                             CenterAlignedTopAppBar(
-                                title = {Text(text = state.title)},
+                                title = { Text(text = state.title) },
                                 navigationIcon = {
                                     IconButton(onClick = { appState.navigate(Groups.route) }) {
-                                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                                        Icon(
+                                            Icons.AutoMirrored.Filled.ArrowBack,
+                                            contentDescription = "Back"
+                                        )
                                     }
                                 },
                                 actions = {
-                                    IconButton(onClick = { println("BLABL") }) {
-                                            Icon(Icons.Filled.Done, contentDescription = "Done")
-                                        }
-//                                    appState.topBarState.value?.let { state ->
-//                                        IconButton(onClick = { state.action }) {
+//                                    IconButton(onClick = { println("BLABL") }) {
 //                                            Icon(Icons.Filled.Done, contentDescription = "Done")
 //                                        }
-//                                    }
+                                    IconButton(onClick = {state.action.invoke()}) {
+                                        Icon(Icons.Filled.Done, contentDescription = "Done")
+                                    }
                                 }
                             )
                         } ?: CenterAlignedTopAppBar(
-                            title = { Text(appState.currentScreen.title)}
+                            title = { Text(appState.currentScreen.title) }
                         )
                     },
                     floatingActionButton = {

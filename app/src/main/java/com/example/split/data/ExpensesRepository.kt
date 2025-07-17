@@ -1,6 +1,7 @@
 package com.example.split.data
 
 import com.example.split.services.StorageService
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class ExpensesRepository @Inject constructor(
@@ -10,7 +11,7 @@ class ExpensesRepository @Inject constructor(
         local.addExpense(expense)
     }
 
-    suspend fun getAllExpenses(): List<Expense> {
+    fun getAllExpenses(): Flow<List<Expense>> {
         return local.getExpenses()
     }
 }

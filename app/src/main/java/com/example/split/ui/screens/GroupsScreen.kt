@@ -18,23 +18,23 @@ fun GroupsScreen(
         ListItem(
             modifier = modifier.clickable(onClick = {navigate(Expenses.route)}),
             headlineContent = { Text("Paula") },
-            trailingContent = { Debt() },
+            trailingContent = { Debt(amount = "10€") },
         )
         ListItem(
             headlineContent = { Text("Paul") },
-            trailingContent = { Debt() }
+            trailingContent = { Debt(amount = "10€") }
         )
         ListItem(
             headlineContent = { Text("Christoph") },
-            trailingContent = { Debt() }
+            trailingContent = { Debt(amount = "10€") }
         )
     }
 }
 
 @Composable
-fun Debt(modifier: Modifier = Modifier) {
+fun Debt(modifier: Modifier = Modifier, amount: String) {
     Column {
         Text("Du schuldest:")
-        Text(text = "10€", fontSize = 16.sp)
+        Text(text = amount, fontSize = 16.sp)
     }
 }
