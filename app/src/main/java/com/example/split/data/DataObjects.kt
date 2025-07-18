@@ -1,15 +1,65 @@
 package com.example.split.data
 
 import androidx.room.Entity
+import androidx.room.ForeignKey
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import java.util.UUID
 
-@Entity(tableName = "expenses")
-data class Expense(
-    @PrimaryKey val id: String = UUID.randomUUID().toString(),
+@Entity(tableName = "users")
+data class UserEntity(
+    @PrimaryKey(autoGenerate = true) val userId: Long = 0,
+    val name: String
+)
+
+@Entity(tableName = "groups")
+data class GroupEntity(
+    @PrimaryKey(autoGenerate = true) val groupId: Long = 0,
+    val groupName: String
+)
+
+@Entity(
+    tableName = "group_memberships",
+    primaryKeys = ["groupId", "userId"],
+    foreignKeys = [
+        ForeignKey(entity = GroupEntity::class, parentColumns = ["groupId"], childColumns = ["groupId"]),
+        ForeignKey(entity = UserEntity::class, parentColumns = ["userId"], childColumns = ["userId"])
+    ],
+    indices = [Index("groupId"), Index("userId")]
+)
+data class GroupMembershipEntity(
+    val groupId: Long,
+    val userId: Long
+)
+
+@Entity(
+    tableName = "expenses",
+    foreignKeys = [
+        ForeignKey(entity = GroupEntity::class, parentColumns = ["groupId"], childColumns = ["groupId"], onDelete = ForeignKey.SET_NULL),
+        ForeignKey(entity = UserEntity::class, parentColumns = ["userId"], childColumns = ["paidByUserId"])
+    ],
+    indices = [Index("groupId"), Index("paidByUserId")]
+)
+data class ExpenseEntity(
+    @PrimaryKey(autoGenerate = true) val expenseId: Long = 0,
     val title: String,
     val amount: Double,
-    val paidBy: String, // userId
-//    val splitBetween: List<String>,
-    val timestamp: Long = System.currentTimeMillis()
+    val date: Long,
+    val paidByUserId: Long,
+    val groupId: Long? = null  // null if not part of a group
+)
+
+@Entity(
+    tableName = "expense_participants",
+    primaryKeys = ["expenseId", "userId"],
+    foreignKeys = [
+        ForeignKey(entity = ExpenseEntity::class, parentColumns = ["expenseId"], childColumns = ["expenseId"]),
+        ForeignKey(entity = UserEntity::class, parentColumns = ["userId"], childColumns = ["userId"])
+    ],
+    indices = [Index("expenseId"), Index("userId")]
+)
+data class ExpenseParticipantEntity(
+    val expenseId: Long,
+    val userId: Long,
+    val share: Double  // how much this user owes
 )
