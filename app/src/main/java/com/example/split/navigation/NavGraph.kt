@@ -16,8 +16,10 @@ fun NavGraphBuilder.setupNavGraph(
 ) {
     composable(Groups.route) {
         appState.fabState.value = null
-        appState.topBarState.value = null
-        GroupsScreen(navigate = { route -> appState.navigate(route) })
+        GroupsScreen(
+            navigate = { route -> appState.navigate(route) },
+            setTopBar = { appState.topBarState.value = it }
+        )
     }
 
     composable(Friends.route) {

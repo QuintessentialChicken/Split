@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.split.FabState
+import com.example.split.IconWrapper
 import com.example.split.TopBarState
 import com.example.split.ui.screens.Debt
 import com.example.split.utils.CurrencyOutputTransformation
@@ -44,7 +45,7 @@ import com.example.split.utils.DigitOnlyInputTransformation
 import org.w3c.dom.Text
 import kotlin.math.exp
 
-@OptIn(ExperimentalSharedTransitionApi::class)
+@OptIn(ExperimentalSharedTransitionApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun ExpensesScreen(
     modifier: Modifier = Modifier,
@@ -72,11 +73,7 @@ fun ExpensesScreen(
     ) {
         when (viewModel.currentState) {
             State.HOME -> {
-                setTopBar(null)
-                Text(
-                    fontSize = 24.sp,
-                    text = "Paula Seidel",
-                )
+                setTopBar(TopBarState("Paula Seidel"))
                 Column {
                     expenses.forEach { expense ->
                         ListItem(
@@ -92,7 +89,12 @@ fun ExpensesScreen(
                 var title = rememberTextFieldState()
                 var amount = rememberTextFieldState()
                 setFab(null)
-                setTopBar(TopBarState("Add Expense") { viewModel.confirmAdd(title, amount) })
+                setTopBar(TopBarState("Add Expense", actionIcon = IconWrapper(Icons.Default.Add, "Confirm Add") {
+                    viewModel.confirmAdd(
+                        title,
+                        amount
+                    )
+                }))
                 AddExpense(title = title, amount = amount)
             }
         }

@@ -4,43 +4,60 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.animation.ExperimentalSharedTransitionApi
-import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.AcUnit
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MediumTopAppBar
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import com.example.split.navigation.Expenses
-import com.example.split.navigation.Groups
 import com.example.split.navigation.setupNavGraph
 import com.example.split.ui.components.BottomBar
-import com.example.split.ui.components.TopBar
 import com.example.split.ui.theme.SplitTheme
 import dagger.hilt.android.AndroidEntryPoint
 
+
+val TESTING = false
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
@@ -49,54 +66,36 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             SplitTheme {
-                val appState = rememberAppState()
-                Scaffold(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(Color.Green),
-                    containerColor = MaterialTheme.colorScheme.surface,
-                    topBar = {
-                        appState.topBarState.value?.let { state ->
-                            CenterAlignedTopAppBar(
-                                title = { Text(text = state.title) },
-                                navigationIcon = {
-                                    IconButton(onClick = { appState.navigate(Groups.route) }) {
-                                        Icon(
-                                            Icons.AutoMirrored.Filled.ArrowBack,
-                                            contentDescription = "Back"
-                                        )
-                                    }
-                                },
-                                actions = {
-//                                    IconButton(onClick = { println("BLABL") }) {
-//                                            Icon(Icons.Filled.Done, contentDescription = "Done")
-//                                        }
-                                    IconButton(onClick = {state.action.invoke()}) {
-                                        Icon(Icons.Filled.Done, contentDescription = "Done")
-                                    }
-                                }
-                            )
-                        } ?: CenterAlignedTopAppBar(
-                            title = { Text(appState.currentScreen.title) }
-                        )
-                    },
-                    floatingActionButton = {
-                        appState.fabState.value?.let { state ->
-                            FloatingActionButton(onClick = state.onClick) {
-                                Icon(state.icon, contentDescription = state.contentDescription)
+                if (TESTING) ChristianeDebtScreen()
+                else {
+                    val appState = rememberAppState()
+                    Scaffold(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(Color.Green),
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        topBar = {
+                            appState.topBarState.value?.let { state ->
+                                CreateTopBar(state = state, appState = appState)
                             }
+                        },
+                        floatingActionButton = {
+                            appState.fabState.value?.let { state ->
+                                FloatingActionButton(onClick = state.onClick) {
+                                    Icon(state.icon, contentDescription = state.contentDescription)
+                                }
+                            }
+                        },
+                        bottomBar = { BottomBar(appState) }) { innerPadding ->
+                        NavHost(
+                            navController = appState.navController,
+                            startDestination = Expenses.route,
+                            modifier = Modifier.padding(innerPadding)
+                        ) {
+                            setupNavGraph(appState)
                         }
-                    },
-                    bottomBar = { BottomBar(appState) }
-                ) { innerPadding ->
-                    NavHost(
-                        navController = appState.navController,
-                        startDestination = Expenses.route,
-                        modifier = Modifier.padding(innerPadding)
-                    ) {
-                        setupNavGraph(appState)
-                    }
 
+                    }
                 }
             }
         }
@@ -106,11 +105,302 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun rememberAppState(
     navController: NavHostController = rememberNavController(),
-) =
-    remember(
+) = remember(
+    navController,
+) {
+    SplitAppState(
         navController,
-    ) {
-        SplitAppState(
-            navController,
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CreateTopBar(
+    modifier: Modifier = Modifier,
+    state: TopBarState,
+    appState: SplitAppState
+) {
+    when (state.type) {
+        TopBarType.CENTER -> {
+            CenterAlignedTopAppBar(
+                title = { Text(state.title) },
+                navigationIcon = { state.navIcon?.let { navIcon -> TopBarIcon(iconWrapper = navIcon) } },
+                actions = { state.actionIcon?.let { actionIcon -> TopBarIcon(iconWrapper = actionIcon)} },
+                scrollBehavior = state.scrollBehavior
+            )
+        }
+        TopBarType.SMALL -> TODO()
+        TopBarType.MEDIUM -> TODO()
+        TopBarType.LARGE -> TODO()
+    }
+}
+
+@Composable
+fun TopBarIcon(
+    modifier: Modifier = Modifier,
+    iconWrapper: IconWrapper
+) {
+    IconButton(onClick = { iconWrapper.onClick }) {
+        Icon(
+            iconWrapper.icon,
+            contentDescription = iconWrapper.contentDescription
         )
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ChristianeDebtScreen() {
+    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
+
+    Scaffold(
+        topBar = {
+            LargeTopAppBar(
+                title = {
+                    Text("Christiane", maxLines = 1)
+                },
+                navigationIcon = {
+                    IconButton(onClick = { /* handle back */ }) {
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                    }
+                },
+                actions = {
+                    IconButton(onClick = { /* handle settings */ }) {
+                        Icon(Icons.Default.Settings, contentDescription = "Settings")
+                    }
+                },
+                scrollBehavior = scrollBehavior
+            )
+        },
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
+    ) { innerPadding ->
+
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+        ) {
+            item {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text("Christiane", style = MaterialTheme.typography.headlineMedium)
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        "Du schuldest Christiane 1.135,77 €",
+                        style = MaterialTheme.typography.bodyLarge.copy(color = Color.Red)
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Button(
+                            onClick = { /* Schulden begleichen */ },
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF5722))
+                        ) {
+                            Text("Schulden begleichen")
+                        }
+                        OutlinedButton(onClick = { /* Erinnern */ }) {
+                            Text("Erinnern…")
+                        }
+                        OutlinedButton(onClick = { /* Statistik */ }) {
+                            Icon(
+                                Icons.Default.AcUnit, // Replace with real icon
+                                contentDescription = null,
+                                tint = Color.Unspecified
+                            )
+                            Spacer(Modifier.width(4.dp))
+                            Text("Statistik")
+                        }
+                    }
+                }
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text("Christiane", style = MaterialTheme.typography.headlineMedium)
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        "Du schuldest Christiane 1.135,77 €",
+                        style = MaterialTheme.typography.bodyLarge.copy(color = Color.Red)
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Button(
+                            onClick = { /* Schulden begleichen */ },
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF5722))
+                        ) {
+                            Text("Schulden begleichen")
+                        }
+                        OutlinedButton(onClick = { /* Erinnern */ }) {
+                            Text("Erinnern…")
+                        }
+                        OutlinedButton(onClick = { /* Statistik */ }) {
+                            Icon(
+                                Icons.Default.AcUnit, // Replace with real icon
+                                contentDescription = null,
+                                tint = Color.Unspecified
+                            )
+                            Spacer(Modifier.width(4.dp))
+                            Text("Statistik")
+                        }
+                    }
+                }
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text("Christiane", style = MaterialTheme.typography.headlineMedium)
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        "Du schuldest Christiane 1.135,77 €",
+                        style = MaterialTheme.typography.bodyLarge.copy(color = Color.Red)
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Button(
+                            onClick = { /* Schulden begleichen */ },
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF5722))
+                        ) {
+                            Text("Schulden begleichen")
+                        }
+                        OutlinedButton(onClick = { /* Erinnern */ }) {
+                            Text("Erinnern…")
+                        }
+                        OutlinedButton(onClick = { /* Statistik */ }) {
+                            Icon(
+                                Icons.Default.AcUnit, // Replace with real icon
+                                contentDescription = null,
+                                tint = Color.Unspecified
+                            )
+                            Spacer(Modifier.width(4.dp))
+                            Text("Statistik")
+                        }
+                    }
+                }
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text("Christiane", style = MaterialTheme.typography.headlineMedium)
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        "Du schuldest Christiane 1.135,77 €",
+                        style = MaterialTheme.typography.bodyLarge.copy(color = Color.Red)
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Button(
+                            onClick = { /* Schulden begleichen */ },
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF5722))
+                        ) {
+                            Text("Schulden begleichen")
+                        }
+                        OutlinedButton(onClick = { /* Erinnern */ }) {
+                            Text("Erinnern…")
+                        }
+                        OutlinedButton(onClick = { /* Statistik */ }) {
+                            Icon(
+                                Icons.Default.AcUnit, // Replace with real icon
+                                contentDescription = null,
+                                tint = Color.Unspecified
+                            )
+                            Spacer(Modifier.width(4.dp))
+                            Text("Statistik")
+                        }
+                    }
+                }
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text("Christiane", style = MaterialTheme.typography.headlineMedium)
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        "Du schuldest Christiane 1.135,77 €",
+                        style = MaterialTheme.typography.bodyLarge.copy(color = Color.Red)
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Button(
+                            onClick = { /* Schulden begleichen */ },
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF5722))
+                        ) {
+                            Text("Schulden begleichen")
+                        }
+                        OutlinedButton(onClick = { /* Erinnern */ }) {
+                            Text("Erinnern…")
+                        }
+                        OutlinedButton(onClick = { /* Statistik */ }) {
+                            Icon(
+                                Icons.Default.AcUnit, // Replace with real icon
+                                contentDescription = null,
+                                tint = Color.Unspecified
+                            )
+                            Spacer(Modifier.width(4.dp))
+                            Text("Statistik")
+                        }
+                    }
+                }
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text("Christiane", style = MaterialTheme.typography.headlineMedium)
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        "Du schuldest Christiane 1.135,77 €",
+                        style = MaterialTheme.typography.bodyLarge.copy(color = Color.Red)
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Button(
+                            onClick = { /* Schulden begleichen */ },
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF5722))
+                        ) {
+                            Text("Schulden begleichen")
+                        }
+                        OutlinedButton(onClick = { /* Erinnern */ }) {
+                            Text("Erinnern…")
+                        }
+                        OutlinedButton(onClick = { /* Statistik */ }) {
+                            Icon(
+                                Icons.Default.AcUnit, // Replace with real icon
+                                contentDescription = null,
+                                tint = Color.Unspecified
+                            )
+                            Spacer(Modifier.width(4.dp))
+                            Text("Statistik")
+                        }
+                    }
+                }
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text("Christiane", style = MaterialTheme.typography.headlineMedium)
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        "Du schuldest Christiane 1.135,77 €",
+                        style = MaterialTheme.typography.bodyLarge.copy(color = Color.Red)
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Button(
+                            onClick = { /* Schulden begleichen */ },
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF5722))
+                        ) {
+                            Text("Schulden begleichen")
+                        }
+                        OutlinedButton(onClick = { /* Erinnern */ }) {
+                            Text("Erinnern…")
+                        }
+                        OutlinedButton(onClick = { /* Statistik */ }) {
+                            Icon(
+                                Icons.Default.AcUnit, // Replace with real icon
+                                contentDescription = null,
+                                tint = Color.Unspecified
+                            )
+                            Spacer(Modifier.width(4.dp))
+                            Text("Statistik")
+                        }
+                    }
+                }
+            }
+
+            // Add more items here as needed
+        }
+    }
+}

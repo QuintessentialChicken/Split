@@ -1,7 +1,13 @@
 package com.example.split
 
+import android.graphics.drawable.Icon
 import android.util.Log
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.TopAppBarState
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavHostController
@@ -42,7 +48,23 @@ data class FabState(
     val onClick: () -> Unit
 )
 
-data class TopBarState(
-    var title: String,
-    var action: () -> Unit
+enum class TopBarType {
+    CENTER,
+    SMALL,
+    MEDIUM,
+    LARGE
+}
+
+data class IconWrapper(
+    val icon: ImageVector,
+    val contentDescription: String,
+    val onClick: () -> Unit
+)
+
+data class TopBarState @OptIn(ExperimentalMaterial3Api::class) constructor(
+    var title: String = "",
+    var type: TopBarType = TopBarType.CENTER,
+    var navIcon: IconWrapper? = null,
+    var scrollBehavior: TopAppBarScrollBehavior? = null,
+    var actionIcon: IconWrapper? = null,
 )
