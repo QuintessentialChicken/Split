@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import com.example.split.data.ExpenseDao
 import com.example.split.data.SplitDatabase
+import com.example.split.data.UserDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -26,4 +27,7 @@ object DatabaseModule {
 
     @Provides
     fun provideExpenseDao(db: SplitDatabase): ExpenseDao = db.expenseDao()
+
+    @Provides
+    fun provideUserDao(db: SplitDatabase): UserDao = db.userDao()
 }

@@ -9,12 +9,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.split.data.Expense
 import com.example.split.data.ExpensesRepository
+import com.example.split.data.User
+import com.example.split.data.UsersRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.WhileSubscribed
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 import javax.inject.Inject
 
 enum class State {
@@ -24,7 +23,8 @@ enum class State {
 
 @HiltViewModel
 class ExpensesViewModel @Inject constructor(
-    private val repository: ExpensesRepository
+    private val expensesRepo: ExpensesRepository,
+    private val userRepo: UsersRepository
 ) : ViewModel() {
 
     private var _currentState by mutableStateOf(State.HOME)
@@ -35,7 +35,7 @@ class ExpensesViewModel @Inject constructor(
             println(_currentState)
         }
 
-    val expenses = repository.getAllExpenses()//.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+    val expenses = expensesRepo.getAllExpenses()//.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
 
     fun handleBackPress() {
@@ -51,11 +51,13 @@ class ExpensesViewModel @Inject constructor(
     ) {
         amount.edit { insert(this.length - 2, ".") }
         viewModelScope.launch {
-            repository.addExpense(
+            userRepo.addUser(User(2, "Paula"))
+            expensesRepo.addExpense(
                 Expense(
                     title = title.text.toString(),
                     amount = amount.text.toString().toDouble(),
-                    paidBy = "Ich"
+                    date = LocalDate.now().toEpochDay(),
+                    paidByUserId = 1
                 )
             )
         }

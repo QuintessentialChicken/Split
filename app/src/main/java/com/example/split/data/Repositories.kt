@@ -15,3 +15,11 @@ class ExpensesRepository @Inject constructor(
         return local.getExpenses()
     }
 }
+
+class UsersRepository @Inject constructor(
+    private val local: StorageService
+) {
+    suspend fun addUser(user: User) {
+        local.addUser(user)
+    }
+}

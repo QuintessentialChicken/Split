@@ -22,6 +22,12 @@ interface ExpenseDao {
     @Update
     suspend fun update(expense: Expense)
 
-    @Query("DELETE FROM expenses WHERE id = :id")
+    @Query("DELETE FROM expenses WHERE expenseId = :id")
     suspend fun delete(id: String)
+}
+
+@Dao
+interface UserDao {
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insert(user: User)
 }

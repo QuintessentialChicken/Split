@@ -1,9 +1,11 @@
 package com.example.split.services
 
 import com.example.split.data.Expense
+import com.example.split.data.User
 import kotlinx.coroutines.flow.Flow
 
 interface StorageService {
+    suspend fun addUser(user: User)
     suspend fun addExpense(expense: Expense)
     fun getExpenses(): Flow<List<Expense>>
     suspend fun deleteExpense(id: String)

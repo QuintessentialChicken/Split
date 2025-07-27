@@ -2,6 +2,8 @@ package com.example.split.services.modules
 
 import com.example.split.data.ExpenseDao
 import com.example.split.data.ExpensesRepository
+import com.example.split.data.UserDao
+import com.example.split.data.UsersRepository
 import com.example.split.services.StorageService
 import com.example.split.services.impl.RoomStorageServiceImpl
 import dagger.Module
@@ -15,11 +17,17 @@ import javax.inject.Singleton
 object RepositoryModule {
 
     @Provides
-    fun provideLocalStorageService(dao: ExpenseDao): StorageService = RoomStorageServiceImpl(dao)
+    fun provideLocalStorageService(expenseDao: ExpenseDao, userDao: UserDao): StorageService = RoomStorageServiceImpl(expenseDao, userDao)
 
     @Provides
     @Singleton
-    fun provideRepository(
+    fun provideExpenseRepository(
         local: StorageService
     ): ExpensesRepository = ExpensesRepository(local)
+
+    @Provides
+    @Singleton
+    fun provideUserRepository(
+        local: StorageService
+    ): UsersRepository = UsersRepository(local)
 }

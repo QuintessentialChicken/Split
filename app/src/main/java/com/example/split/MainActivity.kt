@@ -36,6 +36,7 @@ import androidx.compose.material3.MediumTopAppBar
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarColors
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -94,7 +95,6 @@ class MainActivity : ComponentActivity() {
                         ) {
                             setupNavGraph(appState)
                         }
-
                     }
                 }
             }
@@ -131,7 +131,15 @@ fun CreateTopBar(
         }
         TopBarType.SMALL -> TODO()
         TopBarType.MEDIUM -> TODO()
-        TopBarType.LARGE -> TODO()
+        TopBarType.LARGE -> {
+            LargeTopAppBar(
+                title = { Text(state.title, maxLines = 1) },
+                navigationIcon = { state.navIcon?.let { navIcon -> TopBarIcon(iconWrapper = navIcon) } },
+                actions = { state.actionIcon?.let { actionIcon -> TopBarIcon(iconWrapper = actionIcon)} },
+                scrollBehavior = state.scrollBehavior,
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.tertiary)
+            )
+        }
     }
 }
 
@@ -140,7 +148,7 @@ fun TopBarIcon(
     modifier: Modifier = Modifier,
     iconWrapper: IconWrapper
 ) {
-    IconButton(onClick = { iconWrapper.onClick }) {
+    IconButton(onClick = iconWrapper.onClick) {
         Icon(
             iconWrapper.icon,
             contentDescription = iconWrapper.contentDescription
@@ -155,22 +163,7 @@ fun ChristianeDebtScreen() {
 
     Scaffold(
         topBar = {
-            LargeTopAppBar(
-                title = {
-                    Text("Christiane", maxLines = 1)
-                },
-                navigationIcon = {
-                    IconButton(onClick = { /* handle back */ }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
-                    }
-                },
-                actions = {
-                    IconButton(onClick = { /* handle settings */ }) {
-                        Icon(Icons.Default.Settings, contentDescription = "Settings")
-                    }
-                },
-                scrollBehavior = scrollBehavior
-            )
+
         },
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
     ) { innerPadding ->

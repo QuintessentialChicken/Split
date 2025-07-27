@@ -7,7 +7,8 @@ import androidx.room.RoomDatabase
 import dagger.Provides
 import javax.inject.Singleton
 
-@Database(entities = [Expense::class], version = 1)
+@Database(entities = [Expense::class, Group::class, User::class], version = 1)
 abstract class SplitDatabase : RoomDatabase() {
     abstract fun expenseDao(): ExpenseDao
+    abstract fun userDao(): UserDao
 }

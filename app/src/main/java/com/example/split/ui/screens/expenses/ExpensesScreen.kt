@@ -22,6 +22,7 @@ import androidx.compose.material3.InputChip
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -39,6 +40,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.split.FabState
 import com.example.split.IconWrapper
 import com.example.split.TopBarState
+import com.example.split.TopBarType
 import com.example.split.ui.screens.Debt
 import com.example.split.utils.CurrencyOutputTransformation
 import com.example.split.utils.DigitOnlyInputTransformation
@@ -73,7 +75,11 @@ fun ExpensesScreen(
     ) {
         when (viewModel.currentState) {
             State.HOME -> {
-                setTopBar(TopBarState("Paula Seidel"))
+                setTopBar(TopBarState(
+                    title = "Paula Seidel",
+                    type = TopBarType.LARGE,
+                    scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
+                ))
                 Column {
                     expenses.forEach { expense ->
                         ListItem(
@@ -89,7 +95,7 @@ fun ExpensesScreen(
                 var title = rememberTextFieldState()
                 var amount = rememberTextFieldState()
                 setFab(null)
-                setTopBar(TopBarState("Add Expense", actionIcon = IconWrapper(Icons.Default.Add, "Confirm Add") {
+                setTopBar(TopBarState(title = "Add Expense", actionIcon = IconWrapper(Icons.Default.Add, "Confirm Add") {
                     viewModel.confirmAdd(
                         title,
                         amount

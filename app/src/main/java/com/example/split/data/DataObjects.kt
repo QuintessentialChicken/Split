@@ -4,16 +4,15 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import java.util.UUID
 
 @Entity(tableName = "users")
-data class UserEntity(
+data class User(
     @PrimaryKey(autoGenerate = true) val userId: Long = 0,
     val name: String
 )
 
 @Entity(tableName = "groups")
-data class GroupEntity(
+data class Group(
     @PrimaryKey(autoGenerate = true) val groupId: Long = 0,
     val groupName: String
 )
@@ -22,8 +21,8 @@ data class GroupEntity(
     tableName = "group_memberships",
     primaryKeys = ["groupId", "userId"],
     foreignKeys = [
-        ForeignKey(entity = GroupEntity::class, parentColumns = ["groupId"], childColumns = ["groupId"]),
-        ForeignKey(entity = UserEntity::class, parentColumns = ["userId"], childColumns = ["userId"])
+        ForeignKey(entity = Group::class, parentColumns = ["groupId"], childColumns = ["groupId"]),
+        ForeignKey(entity = User::class, parentColumns = ["userId"], childColumns = ["userId"])
     ],
     indices = [Index("groupId"), Index("userId")]
 )
@@ -35,12 +34,12 @@ data class GroupMembershipEntity(
 @Entity(
     tableName = "expenses",
     foreignKeys = [
-        ForeignKey(entity = GroupEntity::class, parentColumns = ["groupId"], childColumns = ["groupId"], onDelete = ForeignKey.SET_NULL),
-        ForeignKey(entity = UserEntity::class, parentColumns = ["userId"], childColumns = ["paidByUserId"])
+        ForeignKey(entity = Group::class, parentColumns = ["groupId"], childColumns = ["groupId"], onDelete = ForeignKey.SET_NULL),
+        ForeignKey(entity = User::class, parentColumns = ["userId"], childColumns = ["paidByUserId"])
     ],
     indices = [Index("groupId"), Index("paidByUserId")]
 )
-data class ExpenseEntity(
+data class Expense(
     @PrimaryKey(autoGenerate = true) val expenseId: Long = 0,
     val title: String,
     val amount: Double,
@@ -53,8 +52,8 @@ data class ExpenseEntity(
     tableName = "expense_participants",
     primaryKeys = ["expenseId", "userId"],
     foreignKeys = [
-        ForeignKey(entity = ExpenseEntity::class, parentColumns = ["expenseId"], childColumns = ["expenseId"]),
-        ForeignKey(entity = UserEntity::class, parentColumns = ["userId"], childColumns = ["userId"])
+        ForeignKey(entity = Expense::class, parentColumns = ["expenseId"], childColumns = ["expenseId"]),
+        ForeignKey(entity = User::class, parentColumns = ["userId"], childColumns = ["userId"])
     ],
     indices = [Index("expenseId"), Index("userId")]
 )
