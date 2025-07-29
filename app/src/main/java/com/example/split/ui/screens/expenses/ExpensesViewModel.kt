@@ -27,7 +27,7 @@ class ExpensesViewModel @Inject constructor(
     private val userRepo: UsersRepository
 ) : ViewModel() {
 
-    private var _currentState by mutableStateOf(State.HOME)
+    private var _currentState by mutableStateOf(State.ADD)
     var currentState: State
         get() = _currentState
         set(value) {
@@ -39,10 +39,7 @@ class ExpensesViewModel @Inject constructor(
 
 
     fun handleBackPress() {
-        when (_currentState) {
-            State.ADD -> _currentState = State.HOME
-            State.HOME -> {}
-        }
+        _currentState = State.HOME
     }
 
     fun confirmAdd(

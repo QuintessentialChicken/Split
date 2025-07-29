@@ -2,24 +2,37 @@ package com.example.split.ui.screens.expenses
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.ime
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.text.input.InputTransformation
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Note
+import androidx.compose.material.icons.automirrored.outlined.Note
+import androidx.compose.material.icons.automirrored.outlined.NoteAdd
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Euro
+import androidx.compose.material.icons.filled.EditCalendar
+import androidx.compose.material.icons.filled.Group
+import androidx.compose.material.icons.filled.Note
+import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.InputChip
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemColors
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBarDefaults
@@ -27,15 +40,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableDoubleStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.split.FabState
 import com.example.split.IconWrapper
@@ -44,8 +53,6 @@ import com.example.split.TopBarType
 import com.example.split.ui.screens.Debt
 import com.example.split.utils.CurrencyOutputTransformation
 import com.example.split.utils.DigitOnlyInputTransformation
-import org.w3c.dom.Text
-import kotlin.math.exp
 
 @OptIn(ExperimentalSharedTransitionApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -64,14 +71,13 @@ fun ExpensesScreen(
         )
     }
 
-    BackHandler { viewModel.handleBackPress() }
+    BackHandler(enabled = viewModel.currentState == State.ADD) { viewModel.handleBackPress() }
 
     val expenses by viewModel.expenses.collectAsState(initial = emptyList())
 
     Column(
         modifier
             .fillMaxSize()
-            .padding(horizontal = 20.dp),
     ) {
         when (viewModel.currentState) {
             State.HOME -> {
@@ -80,6 +86,14 @@ fun ExpensesScreen(
                     type = TopBarType.LARGE,
                     scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
                 ))
+                setFab(
+                    FabState(
+                        Icons.Default.Add,
+                        contentDescription = "Add Expense",
+                        onClick = { viewModel.currentState = State.ADD }
+                    )
+                )
+
                 Column {
                     expenses.forEach { expense ->
                         ListItem(
@@ -110,44 +124,72 @@ fun ExpensesScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddExpense(
-    modifier: Modifier = Modifier,
     title: TextFieldState,
     amount: TextFieldState
 ) {
-
-    FlowRow(
-        modifier = modifier.padding(bottom = 20.dp),
-        itemVerticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    Column (
+        modifier = Modifier
+            .fillMaxHeight()
+            .padding(horizontal = 15.dp),
+        verticalArrangement = Arrangement.SpaceBetween
     ) {
-        Text("Mit dir und: ")
-        InputChip(selected = true, onClick = {}, label = { Text("Paula") })
-    }
-    TextField(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = 30.dp, vertical = 5.dp),
-        label = { Text("Description") },
-        state = title,
-        placeholder = { Text("Enter a description") }
-    )
-    TextField(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = 30.dp, vertical = 5.dp),
-        label = { Text("Amount") },
-        state = amount,
-        placeholder = { Text("0,00€") },
-        inputTransformation = DigitOnlyInputTransformation(),
-        outputTransformation = CurrencyOutputTransformation(),
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-    )
-    Button(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = 50.dp, vertical = 5.dp),
-        onClick = {}
-    ) {
-        Text("Gezahlt von dir und gleichmäßig geteilt")
+        Column {
+            FlowRow(
+                modifier = Modifier.padding(bottom = 20.dp),
+                itemVerticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Text("Mit dir und: ")
+                InputChip(selected = true, onClick = {}, label = { Text("Paula") })
+            }
+            TextField(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 30.dp, vertical = 5.dp),
+                label = { Text("Description") },
+                state = title,
+                placeholder = { Text("Enter a description") }
+            )
+            TextField(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 30.dp, vertical = 5.dp),
+                label = { Text("Amount") },
+                state = amount,
+                placeholder = { Text("0,00€") },
+                inputTransformation = DigitOnlyInputTransformation(),
+                outputTransformation = CurrencyOutputTransformation(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+            )
+            Button(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 60.dp, vertical = 5.dp),
+                onClick = {}
+            ) {
+                Text("Gezahlt von dir und gleichmäßig geteilt")
+            }
+        }
+        Row(
+            modifier = Modifier.imePadding().fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            AssistChip(
+                modifier = Modifier.weight(1f),
+                leadingIcon = { Icon(Icons.Default.Group, "Select a group") },
+                onClick = {},
+                label = { Text("Gruppe auswählen") }
+            )
+            AssistChip(
+                leadingIcon = { Icon(Icons.Default.EditCalendar, "Add a date") },
+                onClick = {},
+                label = { Text("Datum") }
+            )
+            AssistChip(
+                leadingIcon = { Icon(Icons.AutoMirrored.Outlined.NoteAdd, "Add a note") },
+                onClick = {},
+                label = { Text("Notiz") }
+            )
+        }
     }
 }

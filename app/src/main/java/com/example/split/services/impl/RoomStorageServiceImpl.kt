@@ -7,7 +7,6 @@ import com.example.split.data.UserDao
 import com.example.split.services.StorageService
 import kotlinx.coroutines.flow.Flow
 
-// TODO Suspend?
 class RoomStorageServiceImpl(private val expenseDao: ExpenseDao, private val userDao: UserDao) : StorageService {
     override suspend fun addUser(user: User) = userDao.insert(user)
     override suspend fun addExpense(expense: Expense) = expenseDao.insert(expense)

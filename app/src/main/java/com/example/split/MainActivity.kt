@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -52,6 +53,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import com.example.split.navigation.Expenses
+import com.example.split.navigation.Friends
 import com.example.split.navigation.setupNavGraph
 import com.example.split.ui.components.BottomBar
 import com.example.split.ui.theme.SplitTheme
@@ -59,6 +61,7 @@ import dagger.hilt.android.AndroidEntryPoint
 
 
 val TESTING = false
+
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
@@ -67,34 +70,30 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             SplitTheme {
-                if (TESTING) ChristianeDebtScreen()
-                else {
-                    val appState = rememberAppState()
-                    Scaffold(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(Color.Green),
-                        containerColor = MaterialTheme.colorScheme.surface,
-                        topBar = {
-                            appState.topBarState.value?.let { state ->
-                                CreateTopBar(state = state, appState = appState)
-                            }
-                        },
-                        floatingActionButton = {
-                            appState.fabState.value?.let { state ->
-                                FloatingActionButton(onClick = state.onClick) {
-                                    Icon(state.icon, contentDescription = state.contentDescription)
-                                }
-                            }
-                        },
-                        bottomBar = { BottomBar(appState) }) { innerPadding ->
-                        NavHost(
-                            navController = appState.navController,
-                            startDestination = Expenses.route,
-                            modifier = Modifier.padding(innerPadding)
-                        ) {
-                            setupNavGraph(appState)
+                val appState = rememberAppState()
+
+                Scaffold(
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    topBar = {
+                        appState.topBarState.value?.let { state ->
+                            CreateTopBar(state = state, appState = appState)
                         }
+                    },
+                    floatingActionButton = {
+                        appState.fabState.value?.let { state ->
+                            FloatingActionButton(onClick = state.onClick) {
+                                Icon(state.icon, contentDescription = state.contentDescription)
+                            }
+                        }
+                    },
+                    bottomBar = { BottomBar(appState) }
+                ) { innerPadding ->
+                    NavHost(
+                        navController = appState.navController,
+                        startDestination = Expenses.route,
+                        modifier = Modifier.padding(innerPadding).consumeWindowInsets(innerPadding)
+                    ) {
+                        setupNavGraph(appState)
                     }
                 }
             }
@@ -125,17 +124,18 @@ fun CreateTopBar(
             CenterAlignedTopAppBar(
                 title = { Text(state.title) },
                 navigationIcon = { state.navIcon?.let { navIcon -> TopBarIcon(iconWrapper = navIcon) } },
-                actions = { state.actionIcon?.let { actionIcon -> TopBarIcon(iconWrapper = actionIcon)} },
+                actions = { state.actionIcon?.let { actionIcon -> TopBarIcon(iconWrapper = actionIcon) } },
                 scrollBehavior = state.scrollBehavior
             )
         }
+
         TopBarType.SMALL -> TODO()
         TopBarType.MEDIUM -> TODO()
         TopBarType.LARGE -> {
             LargeTopAppBar(
                 title = { Text(state.title, maxLines = 1) },
                 navigationIcon = { state.navIcon?.let { navIcon -> TopBarIcon(iconWrapper = navIcon) } },
-                actions = { state.actionIcon?.let { actionIcon -> TopBarIcon(iconWrapper = actionIcon)} },
+                actions = { state.actionIcon?.let { actionIcon -> TopBarIcon(iconWrapper = actionIcon) } },
                 scrollBehavior = state.scrollBehavior,
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.tertiary)
             )
