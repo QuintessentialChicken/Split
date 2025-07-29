@@ -50,6 +50,7 @@ fun TopBar(
     )
 }
 
+
 @Composable
 fun BottomBar(
     appState: SplitAppState

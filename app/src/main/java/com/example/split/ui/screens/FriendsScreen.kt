@@ -14,6 +14,7 @@ import androidx.compose.ui.unit.dp
 import com.example.split.IconWrapper
 import com.example.split.TopBarState
 import com.example.split.navigation.Expenses
+import com.example.split.ui.components.Debt
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

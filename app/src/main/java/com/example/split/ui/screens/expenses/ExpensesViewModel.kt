@@ -29,7 +29,7 @@ class ExpensesViewModel @Inject constructor(
     private val userRepo: UsersRepository
 ) : ViewModel() {
 
-    private var _currentState by mutableStateOf(State.ADD)
+    private var _currentState by mutableStateOf(State.HOME)
     var currentState: State
         get() = _currentState
         set(value) {
@@ -38,7 +38,7 @@ class ExpensesViewModel @Inject constructor(
 
     internal var selectedDate: Long? = null
 
-    val expenses = expensesRepo.getAllExpenses()//.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+    val expenses = expensesRepo.getAllExpenses()
 
 
     fun handleBackPress() {
@@ -60,6 +60,7 @@ class ExpensesViewModel @Inject constructor(
                     paidByUserId = 1
                 )
             )
+
         }
         _currentState = State.HOME
     }

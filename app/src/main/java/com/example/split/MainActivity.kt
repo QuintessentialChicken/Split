@@ -4,21 +4,16 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AcUnit
@@ -28,32 +23,30 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LargeFlexibleTopAppBar
 import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.MediumTopAppBar
+import androidx.compose.material3.MediumFlexibleTopAppBar
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarColors
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.TopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import com.example.split.navigation.Expenses
-import com.example.split.navigation.Friends
 import com.example.split.navigation.setupNavGraph
 import com.example.split.ui.components.BottomBar
 import com.example.split.ui.theme.SplitTheme
@@ -73,6 +66,7 @@ class MainActivity : ComponentActivity() {
                 val appState = rememberAppState()
 
                 Scaffold(
+                    modifier = appState.topBarState.value?.scrollBehavior?.let { scrollBehavior -> Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)} ?: Modifier,
                     containerColor = MaterialTheme.colorScheme.surface,
                     topBar = {
                         appState.topBarState.value?.let { state ->
@@ -91,7 +85,9 @@ class MainActivity : ComponentActivity() {
                     NavHost(
                         navController = appState.navController,
                         startDestination = Expenses.route,
-                        modifier = Modifier.padding(innerPadding).consumeWindowInsets(innerPadding)
+                        modifier = Modifier
+                            .padding(innerPadding)
+                            .consumeWindowInsets(innerPadding)
                     ) {
                         setupNavGraph(appState)
                     }
@@ -112,7 +108,7 @@ fun rememberAppState(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun CreateTopBar(
     modifier: Modifier = Modifier,
@@ -125,19 +121,38 @@ fun CreateTopBar(
                 title = { Text(state.title) },
                 navigationIcon = { state.navIcon?.let { navIcon -> TopBarIcon(iconWrapper = navIcon) } },
                 actions = { state.actionIcon?.let { actionIcon -> TopBarIcon(iconWrapper = actionIcon) } },
-                scrollBehavior = state.scrollBehavior
+                scrollBehavior = state.scrollBehavior,
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.primary, subtitleContentColor = MaterialTheme.colorScheme.onPrimary, scrolledContainerColor = MaterialTheme.colorScheme.primary)
             )
         }
-
-        TopBarType.SMALL -> TODO()
-        TopBarType.MEDIUM -> TODO()
-        TopBarType.LARGE -> {
-            LargeTopAppBar(
-                title = { Text(state.title, maxLines = 1) },
+        TopBarType.SMALL -> {
+            TopAppBar(
+                title = { Text(state.title) },
+                subtitle = { state.subtitle?.let { subtitle -> Text(subtitle)}},
                 navigationIcon = { state.navIcon?.let { navIcon -> TopBarIcon(iconWrapper = navIcon) } },
                 actions = { state.actionIcon?.let { actionIcon -> TopBarIcon(iconWrapper = actionIcon) } },
                 scrollBehavior = state.scrollBehavior,
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.tertiary)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.primary, subtitleContentColor = MaterialTheme.colorScheme.onPrimary, scrolledContainerColor = MaterialTheme.colorScheme.primary)
+            )
+        }
+        TopBarType.MEDIUM -> {
+            MediumFlexibleTopAppBar(
+                title = { Text(state.title) },
+                subtitle = { state.subtitle?.let { subtitle -> Text(subtitle)}},
+                navigationIcon = { state.navIcon?.let { navIcon -> TopBarIcon(iconWrapper = navIcon) } },
+                actions = { state.actionIcon?.let { actionIcon -> TopBarIcon(iconWrapper = actionIcon) } },
+                scrollBehavior = state.scrollBehavior,
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.primary, subtitleContentColor = MaterialTheme.colorScheme.onPrimary, scrolledContainerColor = MaterialTheme.colorScheme.primary)
+            )
+        }
+        TopBarType.LARGE -> {
+            LargeFlexibleTopAppBar(
+                title = { Text(state.title, maxLines = 1) },
+                subtitle = { state.subtitle?.let { subtitle -> Text(subtitle)}},
+                navigationIcon = { state.navIcon?.let { navIcon -> TopBarIcon(iconWrapper = navIcon) } },
+                actions = { state.actionIcon?.let { actionIcon -> TopBarIcon(iconWrapper = actionIcon) } },
+                scrollBehavior = state.scrollBehavior,
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.primary, subtitleContentColor = MaterialTheme.colorScheme.onPrimary, scrolledContainerColor = MaterialTheme.colorScheme.primary)
             )
         }
     }
@@ -156,14 +171,32 @@ fun TopBarIcon(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun ChristianeDebtScreen() {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
 
     Scaffold(
         topBar = {
-
+            LargeFlexibleTopAppBar(
+                title = {
+                    Text("Christiane", maxLines = 1)
+                },
+                subtitle = {
+                    Text("Christiane schuldet dir 200,00€")
+                },
+                navigationIcon = {
+                    IconButton(onClick = { /* handle back */ }) {
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                    }
+                },
+                actions = {
+                    IconButton(onClick = { /* handle settings */ }) {
+                        Icon(Icons.Default.Settings, contentDescription = "Settings")
+                    }
+                },
+                scrollBehavior = scrollBehavior
+            )
         },
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
     ) { innerPadding ->

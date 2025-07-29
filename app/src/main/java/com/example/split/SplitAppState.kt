@@ -9,12 +9,13 @@ import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.TopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavHostController
 import com.example.split.navigation.Destinations
 import com.example.split.navigation.Groups
 
-class SplitAppState (
+class SplitAppState(
     val navController: NavHostController,
 ) {
     val fabState = mutableStateOf<FabState?>(null)
@@ -63,7 +64,9 @@ data class IconWrapper(
 
 data class TopBarState @OptIn(ExperimentalMaterial3Api::class) constructor(
     var title: String = "",
+    var subtitle: String? = null,
     var type: TopBarType = TopBarType.CENTER,
+    var titleHorizontalAlignment: Alignment.Horizontal = Alignment.CenterHorizontally,
     var navIcon: IconWrapper? = null,
     var scrollBehavior: TopAppBarScrollBehavior? = null,
     var actionIcon: IconWrapper? = null,

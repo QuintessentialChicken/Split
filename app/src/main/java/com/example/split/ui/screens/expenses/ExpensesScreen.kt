@@ -2,7 +2,6 @@ package com.example.split.ui.screens.expenses
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.ExperimentalSharedTransitionApi
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
@@ -10,31 +9,23 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.text.ClickableText
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Note
-import androidx.compose.material.icons.automirrored.outlined.Note
 import androidx.compose.material.icons.automirrored.outlined.NoteAdd
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.EditCalendar
-import androidx.compose.material.icons.filled.Group
 import androidx.compose.material.icons.filled.GroupAdd
-import androidx.compose.material.icons.filled.Note
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Button
-import androidx.compose.material3.DatePicker
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.InputChip
 import androidx.compose.material3.ListItem
-import androidx.compose.material3.ListItemColors
-import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBarDefaults
@@ -47,7 +38,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -55,12 +45,14 @@ import com.example.split.FabState
 import com.example.split.IconWrapper
 import com.example.split.TopBarState
 import com.example.split.TopBarType
+import com.example.split.ui.components.DateIcon
 import com.example.split.ui.components.DatePickerModal
-import com.example.split.ui.screens.Debt
+import com.example.split.ui.components.Debt
 import com.example.split.utils.CurrencyOutputTransformation
 import com.example.split.utils.DigitOnlyInputTransformation
-import java.time.LocalDate
-import kotlin.time.Duration.Companion.milliseconds
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.filled.Done
+
 
 @OptIn(ExperimentalSharedTransitionApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -91,6 +83,7 @@ fun ExpensesScreen(
             State.HOME -> {
                 setTopBar(TopBarState(
                     title = "Paula Seidel",
+                    subtitle = "Paula Seidel schuldet dir 200,00€",
                     type = TopBarType.LARGE,
                     scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
                 ))
@@ -102,11 +95,12 @@ fun ExpensesScreen(
                     )
                 )
 
-                Column {
-                    expenses.forEach { expense ->
+                LazyColumn {
+                    items(expenses) { expense ->
                         ListItem(
                             headlineContent = { Text(expense.title) },
                             supportingContent = { Text("Paula hat ${expense.amount}€ gezahlt") },
+                            leadingContent = { DateIcon(timestamp = expense.date)},
                             trailingContent = { Debt(amount = expense.amount.toString() + "€") },
                         )
                     }
@@ -117,7 +111,7 @@ fun ExpensesScreen(
                 var title = rememberTextFieldState()
                 var amount = rememberTextFieldState()
                 setFab(null)
-                setTopBar(TopBarState(title = "Add Expense", actionIcon = IconWrapper(Icons.Default.Add, "Confirm Add") {
+                setTopBar(TopBarState(title = "Add Expense", actionIcon = IconWrapper(Icons.Default.Done, "Confirm Add") {
                     viewModel.confirmAdd(
                         title,
                         amount
