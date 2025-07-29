@@ -187,7 +187,7 @@ fun ChristianeDebtScreen() {
                 },
                 navigationIcon = {
                     IconButton(onClick = { /* handle back */ }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
                 },
                 actions = {

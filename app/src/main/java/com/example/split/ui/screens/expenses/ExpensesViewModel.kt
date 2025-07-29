@@ -3,7 +3,6 @@ package com.example.split.ui.screens.expenses
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.insert
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
@@ -14,8 +13,10 @@ import com.example.split.data.User
 import com.example.split.data.UsersRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneOffset
+import java.time.ZonedDateTime
 import javax.inject.Inject
 
 enum class State {
@@ -38,7 +39,7 @@ class ExpensesViewModel @Inject constructor(
 
     internal var selectedDate: Long? = null
 
-    val expenses = expensesRepo.getAllExpenses()
+    val expenses = expensesRepo.getAllSortedByDateDesc()
 
 
     fun handleBackPress() {
@@ -51,17 +52,22 @@ class ExpensesViewModel @Inject constructor(
     ) {
         amount.edit { insert(this.length - 2, ".") }
         viewModelScope.launch {
-            userRepo.addUser(User(2, "Paula"))
+            val date = if (selectedDate != null) selectedDate!! + (Instant.now().toEpochMilli() - ZonedDateTime.now(ZoneOffset.UTC).toLocalDate().atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli()) else Instant.now().toEpochMilli()
+            println("Selected Date: $selectedDate")
+            println(date)
+            userRepo.addUser(User(1, "Leon"))
             expensesRepo.addExpense(
                 Expense(
                     title = title.text.toString(),
                     amount = amount.text.toString().toDouble(),
-                    date = selectedDate ?: LocalDate.now(ZoneOffset.UTC).atStartOfDay().toInstant(ZoneOffset.UTC).toEpochMilli(),
+                    currencyCode = "EUR",
+                    date = date,
                     paidByUserId = 1
                 )
             )
 
         }
+        selectedDate = null
         _currentState = State.HOME
     }
 

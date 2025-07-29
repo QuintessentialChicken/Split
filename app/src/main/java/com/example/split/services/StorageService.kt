@@ -8,6 +8,7 @@ interface StorageService {
     suspend fun addUser(user: User)
     suspend fun addExpense(expense: Expense)
     fun getExpenses(): Flow<List<Expense>>
+    fun getExpensesSortedByDateDesc(): Flow<List<Expense>>
     suspend fun deleteExpense(id: String)
     suspend fun updateExpense(expense: Expense)
 }

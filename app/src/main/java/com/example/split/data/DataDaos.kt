@@ -16,6 +16,9 @@ interface ExpenseDao {
     @Query("SELECT * FROM expenses")
     fun getAll(): Flow<List<Expense>>
 
+    @Query("SELECT * FROM expenses ORDER BY date DESC")
+    fun getExpensesSortedByDateDesc(): Flow<List<Expense>>
+
     @Delete
     suspend fun delete(expense: Expense)
 

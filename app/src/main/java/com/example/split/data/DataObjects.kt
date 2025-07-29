@@ -43,6 +43,7 @@ data class Expense(
     @PrimaryKey(autoGenerate = true) val expenseId: Long = 0,
     val title: String,
     val amount: Double,
+    val currencyCode: String,
     val date: Long,
     val paidByUserId: Long,
     val groupId: Long? = null  // null if not part of a group

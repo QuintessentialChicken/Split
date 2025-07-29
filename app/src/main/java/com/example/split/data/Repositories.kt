@@ -7,12 +7,16 @@ import javax.inject.Inject
 class ExpensesRepository @Inject constructor(
     private val local: StorageService
 ) {
-    suspend fun addExpense(expense: Expense) {
-        local.addExpense(expense)
+    fun getAll(): Flow<List<Expense>> {
+        return local.getExpenses()
     }
 
-    fun getAllExpenses(): Flow<List<Expense>> {
-        return local.getExpenses()
+    fun getAllSortedByDateDesc(): Flow<List<Expense>> {
+        return local.getExpensesSortedByDateDesc()
+    }
+
+    suspend fun addExpense(expense: Expense) {
+        local.addExpense(expense)
     }
 }
 
