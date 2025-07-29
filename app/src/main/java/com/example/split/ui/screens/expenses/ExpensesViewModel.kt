@@ -3,6 +3,7 @@ package com.example.split.ui.screens.expenses
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.insert
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
@@ -14,6 +15,7 @@ import com.example.split.data.UsersRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import java.time.ZoneOffset
 import javax.inject.Inject
 
 enum class State {
@@ -32,8 +34,9 @@ class ExpensesViewModel @Inject constructor(
         get() = _currentState
         set(value) {
             _currentState = value
-            println(_currentState)
         }
+
+    internal var selectedDate: Long? = null
 
     val expenses = expensesRepo.getAllExpenses()//.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
@@ -53,7 +56,7 @@ class ExpensesViewModel @Inject constructor(
                 Expense(
                     title = title.text.toString(),
                     amount = amount.text.toString().toDouble(),
-                    date = LocalDate.now().toEpochDay(),
+                    date = selectedDate ?: LocalDate.now(ZoneOffset.UTC).atStartOfDay().toInstant(ZoneOffset.UTC).toEpochMilli(),
                     paidByUserId = 1
                 )
             )
