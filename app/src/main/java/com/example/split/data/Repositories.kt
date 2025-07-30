@@ -15,6 +15,10 @@ class ExpensesRepository @Inject constructor(
         return local.getExpensesSortedByDateDesc()
     }
 
+    fun getAllParticipants(): Flow<List<ExpenseParticipant>> {
+        return local.getAllParticipants()
+    }
+
     suspend fun addExpense(expense: Expense) {
         local.addExpense(expense)
     }

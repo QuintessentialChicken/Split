@@ -91,7 +91,7 @@ fun ExpensesScreen(
                 setTopBar(
                     TopBarState(
                         title = "Paula Seidel",
-                        subtitle = "Paula Seidel schuldet dir 200,00€",
+                        subtitle = "Paula Seidel schuldet dir ${viewModel.balance.firstOrNull()?.amount ?: "0.00€"}",
                         type = TopBarType.LARGE,
                         scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
                     )
@@ -103,6 +103,7 @@ fun ExpensesScreen(
                         onClick = { viewModel.currentState = State.ADD }
                     )
                 )
+                Text("Paula Seidel schuldet dir ${viewModel.balance.firstOrNull()?.amount ?: "0.00€"}")
 
                 LazyColumn {
                     var lastDate = "Jun 1970"

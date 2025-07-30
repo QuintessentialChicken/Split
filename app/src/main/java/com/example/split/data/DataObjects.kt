@@ -58,7 +58,7 @@ data class Expense(
     ],
     indices = [Index("expenseId"), Index("userId")]
 )
-data class ExpenseParticipantEntity(
+data class ExpenseParticipant(
     val expenseId: Long,
     val userId: Long,
     val share: Double  // how much this user owes
