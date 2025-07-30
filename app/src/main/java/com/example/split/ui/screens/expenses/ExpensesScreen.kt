@@ -2,20 +2,28 @@ package com.example.split.ui.screens.expenses
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.KeyboardActionHandler
 import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.clearText
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.NoteAdd
@@ -25,7 +33,11 @@ import androidx.compose.material.icons.filled.EditCalendar
 import androidx.compose.material.icons.filled.GroupAdd
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Button
+import androidx.compose.material3.DividerDefaults
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuAnchorType
+import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.InputChip
@@ -36,18 +48,24 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.ImeOptions
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.split.FabState
 import com.example.split.IconWrapper
 import com.example.split.TopBarState
@@ -59,6 +77,7 @@ import com.example.split.utils.CurrencyOutputTransformation
 import com.example.split.utils.DigitOnlyInputTransformation
 import com.example.split.utils.formatCurrency
 import com.example.split.utils.millisToDateString
+import kotlinx.coroutines.flow.StateFlow
 
 
 @OptIn(ExperimentalSharedTransitionApi::class, ExperimentalMaterial3Api::class)
@@ -110,7 +129,7 @@ fun ExpensesScreen(
                     items(expenses) { expense ->
                         val currentDate = millisToDateString(expense.date, "MMMM yyyy")
                         if (currentDate != lastDate) {
-                            Row (
+                            Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(8.dp),
@@ -170,9 +189,7 @@ fun ExpensesScreen(
                             )
                         })
                 )
-                AddExpense(title = title, amount = amount, onDateSelected = {
-                    viewModel.selectedDate = it
-                })
+                AddExpense(title = title, amount = amount, viewModel.filteredOptions, onDateSelected = { viewModel.selectedDate = it }, onChipInput = { viewModel.filterText(it) })
             }
         }
     }
@@ -183,9 +200,19 @@ fun ExpensesScreen(
 fun AddExpense(
     title: TextFieldState,
     amount: TextFieldState,
-    onDateSelected: (date: Long?) -> Unit
+    filteredOptionsFlow: StateFlow<List<String>>,
+    onDateSelected: (date: Long?) -> Unit,
+    onChipInput: (String) -> Unit
 ) {
+    val chips = remember { mutableStateListOf<String>() }
+    var chipEntryState = rememberTextFieldState()
     var showPicker by remember { mutableStateOf(false) }
+    var expanded by remember { mutableStateOf(false) }
+    val filteredOptions by filteredOptionsFlow.collectAsStateWithLifecycle()
+
+
+    LaunchedEffect(chipEntryState) { onChipInput }
+
     Column(
         modifier = Modifier
             .fillMaxHeight()
@@ -194,13 +221,51 @@ fun AddExpense(
     ) {
         Column {
             FlowRow(
-                modifier = Modifier.padding(bottom = 20.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp),
                 itemVerticalAlignment = Alignment.CenterVertically,
+                verticalArrangement = Arrangement.Center,
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Text("Mit dir und: ")
-                InputChip(selected = true, onClick = {}, label = { Text("Paula") })
+                chips.forEach { label ->
+                    InputChip(selected = true, onClick = {}, label = { Text(label) })
+                }
+                ExposedDropdownMenuBox(
+                    expanded = expanded,
+                    onExpandedChange = { expanded = it }
+                ) {
+                    BasicTextField(
+                        modifier = Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryEditable, false),
+                        state = chipEntryState,
+                        textStyle = TextStyle(fontSize = 18.sp),
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                        onKeyboardAction = { performDefaultAction ->
+                            chips.add(chipEntryState.text.toString())
+                            chipEntryState.clearText()
+                            performDefaultAction()
+                        }
+                    )
+                    ExposedDropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false }
+                    ) {
+                        filteredOptions.forEach { option ->
+                            DropdownMenuItem(
+                                text = { Text(option) },
+                                onClick = {
+                                    chips.add(chipEntryState.text.toString())
+                                    chipEntryState.clearText()
+                                    expanded = false
+                                }
+                            )
+                        }
+                    }
+                }
+
             }
+            HorizontalDivider(modifier = Modifier.padding(bottom = 20.dp))
             TextField(
                 modifier = Modifier
                     .fillMaxWidth()

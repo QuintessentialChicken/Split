@@ -19,7 +19,7 @@ class ExpensesRepository @Inject constructor(
         return local.getAllParticipants()
     }
 
-    suspend fun addExpense(expense: Expense) {
+    suspend fun addExpense(expense: Expense, ) {
         local.addExpense(expense)
     }
 }

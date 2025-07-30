@@ -14,6 +14,8 @@ import com.example.split.data.User
 import com.example.split.data.UsersRepository
 import com.example.split.utils.formatCurrency
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -58,6 +60,11 @@ class ExpensesViewModel @Inject constructor(
     val expenses = expensesRepo.getAllSortedByDateDesc()
     val participants = expensesRepo.getAllParticipants()
 
+    private val chipOptions = listOf("Option1, Option2, Option3")
+    private val _filteredOptions = MutableStateFlow(chipOptions)
+    var filteredOptions: StateFlow<List<String>> = _filteredOptions
+
+
     init {
         viewModelScope.launch {
             combine(
@@ -73,6 +80,10 @@ class ExpensesViewModel @Inject constructor(
         }
     }
 
+    fun filterText(input: String) {
+        // This filter returns the full items list when input is an empty string.
+        _filteredOptions.value = chipOptions.filter { it.contains(input, ignoreCase = true) }
+    }
 
     fun handleBackPress() {
         _currentState = State.HOME
@@ -97,7 +108,6 @@ class ExpensesViewModel @Inject constructor(
                     paidByUserId = 1
                 )
             )
-
         }
         selectedDate = null
         _currentState = State.HOME
@@ -110,12 +120,12 @@ class ExpensesViewModel @Inject constructor(
     ): Map<Long, Double> {
 
         // Group participants by expenseId for fast lookup
+        println(participants)
         val partsByExpense = participants.groupBy { it.expenseId }
 
         val balances = mutableMapOf<Long, Double>()
 
         for (expense in expenses) {
-            println(partsByExpense)
             val parts = partsByExpense[expense.expenseId] ?: continue
             for (participant in parts) {
                 if (expense.paidByUserId == userId && participant.userId != userId) {
