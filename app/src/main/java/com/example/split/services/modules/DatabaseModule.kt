@@ -3,6 +3,7 @@ package com.example.split.services.modules
 import android.content.Context
 import androidx.room.Room
 import com.example.split.data.ExpenseDao
+import com.example.split.data.ParticipantDao
 import com.example.split.data.SplitDatabase
 import com.example.split.data.UserDao
 import dagger.Module
@@ -30,4 +31,7 @@ object DatabaseModule {
 
     @Provides
     fun provideUserDao(db: SplitDatabase): UserDao = db.userDao()
+
+    @Provides
+    fun provideParticipantDao(db: SplitDatabase): ParticipantDao = db.participantDao()
 }

@@ -19,14 +19,18 @@ class ExpensesRepository @Inject constructor(
         return local.getAllParticipants()
     }
 
-    suspend fun addExpense(expense: Expense, ) {
-        local.addExpense(expense)
+    suspend fun addExpense(expense: Expense, participants: List<Participant>) {
+        local.addExpense(expense, participants)
     }
 }
 
 class UsersRepository @Inject constructor(
     private val local: StorageService
 ) {
+    fun getAll(): Flow<List<User>> {
+        return local.getAllUsers()
+    }
+
     suspend fun addUser(user: User) {
         local.addUser(user)
     }

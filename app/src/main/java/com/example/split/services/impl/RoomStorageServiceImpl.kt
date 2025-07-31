@@ -3,14 +3,33 @@ package com.example.split.services.impl
 import com.example.split.data.Expense
 import com.example.split.data.ExpenseDao
 import com.example.split.data.ExpenseParticipant
+import com.example.split.data.Participant
+import com.example.split.data.ParticipantDao
 import com.example.split.data.User
 import com.example.split.data.UserDao
 import com.example.split.services.StorageService
 import kotlinx.coroutines.flow.Flow
 
-class RoomStorageServiceImpl(private val expenseDao: ExpenseDao, private val userDao: UserDao) : StorageService {
+class RoomStorageServiceImpl(private val expenseDao: ExpenseDao, private val userDao: UserDao, private val participantDao: ParticipantDao) : StorageService {
     override suspend fun addUser(user: User) = userDao.insert(user)
-    override suspend fun addExpense(expense: Expense) = expenseDao.insert(expense)
+    override fun getAllUsers(): Flow<List<User>> = userDao.getAll()
+
+    override suspend fun addExpense(
+        expense: Expense,
+        participants: List<Participant>
+    ) {
+        val id = expenseDao.insert(expense)
+
+        val entities = participants.map {
+            ExpenseParticipant(
+                expenseId = id,
+                userId = it.userId,
+                share = it.share
+            )
+        }
+        participantDao.insert(entities)
+    }
+
     override fun getExpenses(): Flow<List<Expense>> = expenseDao.getAll()
     override fun getExpensesSortedByDateDesc(): Flow<List<Expense>> = expenseDao.getExpensesSortedByDateDesc()
     override fun getAllParticipants(): Flow<List<ExpenseParticipant>> = expenseDao.getAllParticipants()

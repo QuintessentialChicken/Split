@@ -12,9 +12,10 @@ import androidx.compose.ui.unit.sp
 import com.example.split.utils.millisToDateString
 
 @Composable
-fun Debt(modifier: Modifier = Modifier, amount: String) {
+fun Debt(modifier: Modifier = Modifier, amount: String, owes: Boolean) {
     Column {
-        Text("Du schuldest:")
+        if (owes) Text("Du schuldest:")
+        else Text("Du leihst:")
         Text(text = amount, fontSize = 16.sp)
     }
 }

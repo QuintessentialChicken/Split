@@ -7,6 +7,7 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Currency
 import java.util.Locale
+import kotlin.math.pow
 
 fun millisToDateString(timestamp: Long, format: String): String {
     val dateTime = Instant.ofEpochMilli(timestamp).atZone(ZoneId.systemDefault())
@@ -14,9 +15,17 @@ fun millisToDateString(timestamp: Long, format: String): String {
     return dateTime.format(formatter)
 }
 
-fun formatCurrency(amount: Double, currencyCode: String = "EUR"): String {
-    val formatter = NumberFormat.getCurrencyInstance()
-    formatter.maximumFractionDigits = 2
-    formatter.currency = Currency.getInstance(currencyCode)
-    return formatter.format(amount)
+fun formatCurrency(amount: Int, currencyCode: String = "EUR"): String {
+    val currency = Currency.getInstance(currencyCode)
+    val fractionDigits = currency.defaultFractionDigits
+
+    val majorAmount = amount / 10.0.pow(fractionDigits).toDouble()
+
+    val formatter = NumberFormat.getCurrencyInstance().apply {
+        this.currency = currency
+        maximumFractionDigits = fractionDigits
+        minimumFractionDigits = fractionDigits
+    }
+
+    return formatter.format(majorAmount)
 }

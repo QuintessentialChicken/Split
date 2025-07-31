@@ -20,11 +20,8 @@ class CurrencyOutputTransformation : OutputTransformation {
         val digits = this.toString().filter{ it.isDigit() }
 
         // Convert digits to cents (e.g., "1234" -> "12.34")
-        val cents = digits.toLongOrNull() ?: return
-        val euros = cents / 100
-        val remainingCents = cents % 100
+        val cents = digits.toIntOrNull() ?: return
 
-        val formatted = "$euros,${remainingCents.toString().padStart(2, '0')}€"
-        replace(0, length, formatted)
+        replace(0, length, formatCurrency(cents, "EUR"))
     }
 }

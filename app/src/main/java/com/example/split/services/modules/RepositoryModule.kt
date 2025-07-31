@@ -2,6 +2,7 @@ package com.example.split.services.modules
 
 import com.example.split.data.ExpenseDao
 import com.example.split.data.ExpensesRepository
+import com.example.split.data.ParticipantDao
 import com.example.split.data.UserDao
 import com.example.split.data.UsersRepository
 import com.example.split.services.StorageService
@@ -17,7 +18,7 @@ import javax.inject.Singleton
 object RepositoryModule {
 
     @Provides
-    fun provideLocalStorageService(expenseDao: ExpenseDao, userDao: UserDao): StorageService = RoomStorageServiceImpl(expenseDao, userDao)
+    fun provideLocalStorageService(expenseDao: ExpenseDao, userDao: UserDao, participantDao: ParticipantDao): StorageService = RoomStorageServiceImpl(expenseDao, userDao, participantDao)
 
     @Provides
     @Singleton

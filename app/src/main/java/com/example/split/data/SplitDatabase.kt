@@ -11,4 +11,5 @@ import javax.inject.Singleton
 abstract class SplitDatabase : RoomDatabase() {
     abstract fun expenseDao(): ExpenseDao
     abstract fun userDao(): UserDao
+    abstract fun participantDao(): ParticipantDao
 }

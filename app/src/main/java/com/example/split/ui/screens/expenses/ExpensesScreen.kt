@@ -99,8 +99,7 @@ fun ExpensesScreen(
 
     BackHandler(enabled = viewModel.currentState == State.ADD) { viewModel.handleBackPress() }
 
-    val expenses by viewModel.expenses.collectAsState(initial = emptyList())
-
+//    val expenses by viewModel.expenses.collectAsState(initial = emptyList())
     Column(
         modifier
             .fillMaxSize()
@@ -110,7 +109,7 @@ fun ExpensesScreen(
                 setTopBar(
                     TopBarState(
                         title = "Paula Seidel",
-                        subtitle = "Paula Seidel schuldet dir ${viewModel.balance.firstOrNull()?.amount ?: "0.00€"}",
+                        subtitle = "schuldet dir ${viewModel.balance.firstOrNull()?.amount ?: "0.00€"}",
                         type = TopBarType.LARGE,
                         scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
                     )
@@ -122,12 +121,10 @@ fun ExpensesScreen(
                         onClick = { viewModel.currentState = State.ADD }
                     )
                 )
-                Text("Paula Seidel schuldet dir ${viewModel.balance.firstOrNull()?.amount ?: "0.00€"}")
-
                 LazyColumn {
                     var lastDate = "Jun 1970"
-                    items(expenses) { expense ->
-                        val currentDate = millisToDateString(expense.date, "MMMM yyyy")
+                    items(viewModel.uiExpenses) { expense ->
+                        val currentDate = millisToDateString(expense.paidOn, "MMMM yyyy")
                         if (currentDate != lastDate) {
                             Row(
                                 modifier = Modifier
@@ -157,17 +154,13 @@ fun ExpensesScreen(
                                 )
                             }
                         }
+                        val payer = if (expense.owes) expense.paidBy + "hat" else "Du hast"
                         ListItem(
                             headlineContent = { Text(expense.title) },
-                            supportingContent = { Text("Paula hat ${expense.amount}€ gezahlt") },
-                            leadingContent = { DateIcon(timestamp = expense.date) },
+                            supportingContent = { Text("$payer ${expense.amountPaid} gezahlt") },
+                            leadingContent = { DateIcon(timestamp = expense.paidOn) },
                             trailingContent = {
-                                Debt(
-                                    amount = formatCurrency(
-                                        expense.amount,
-                                        expense.currencyCode
-                                    )
-                                )
+                                Debt(amount = expense.amountOwed, owes = expense.owes)
                             },
                         )
                         lastDate = currentDate

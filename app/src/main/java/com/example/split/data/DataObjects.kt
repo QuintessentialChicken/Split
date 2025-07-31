@@ -42,7 +42,7 @@ data class GroupMembershipEntity(
 data class Expense(
     @PrimaryKey(autoGenerate = true) val expenseId: Long = 0,
     val title: String,
-    val amount: Double,
+    val amount: Int,
     val currencyCode: String,
     val date: Long,
     val paidByUserId: Long,
@@ -61,5 +61,13 @@ data class Expense(
 data class ExpenseParticipant(
     val expenseId: Long,
     val userId: Long,
-    val share: Double  // how much this user owes
+    val share: Double
+)
+
+/*
+Pass this to the repository, since the expenseId isn't known yet. It gets changed to a proper ExpenseParticipant
+ */
+data class Participant(
+    val userId: Long,
+    val share: Double
 )

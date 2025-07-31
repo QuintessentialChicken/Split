@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface ExpenseDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(expense: Expense)
+    suspend fun insert(expense: Expense): Long
 
     @Query("SELECT * FROM expenses")
     fun getAll(): Flow<List<Expense>>
@@ -36,4 +36,13 @@ interface ExpenseDao {
 interface UserDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(user: User)
+
+    @Query("SELECT * FROM users")
+    fun getAll(): Flow<List<User>>
+}
+
+@Dao
+interface ParticipantDao {
+    @Insert
+    suspend fun insert(participants: List<ExpenseParticipant>)
 }

@@ -26,15 +26,15 @@ fun GroupsScreen(
         ListItem(
             modifier = modifier.clickable(onClick = {navigate(Expenses.route)}),
             headlineContent = { Text("Paula") },
-            trailingContent = { Debt(amount = "10€") },
+            trailingContent = { Debt(amount = "10€", owes = true) },
         )
         ListItem(
             headlineContent = { Text("Paul") },
-            trailingContent = { Debt(amount = "10€") }
+            trailingContent = { Debt(amount = "10€", owes = true) }
         )
         ListItem(
             headlineContent = { Text("Christoph") },
-            trailingContent = { Debt(amount = "10€") }
+            trailingContent = { Debt(amount = "10€", owes = false) }
         )
     }
 }
