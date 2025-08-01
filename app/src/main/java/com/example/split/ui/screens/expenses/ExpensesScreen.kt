@@ -174,6 +174,7 @@ fun ExpensesScreen(
                     amount = amount,
                     viewModel.filteredOptions,
                     onDateSelected = { viewModel.selectedDate = it },
+                    onUserAdded = { viewModel.selectedUsers.add(it) },
                     onChipInput = { /*viewModel.filterText(it)*/ })
             }
         }
@@ -187,6 +188,7 @@ fun AddExpense(
     amount: TextFieldState,
     filteredOptions: MutableList<User>,
     onDateSelected: (date: Long?) -> Unit,
+    onUserAdded: (User) -> Unit,
     onChipInput: (String) -> Unit
 ) {
     val chips = remember { mutableStateListOf<String>() }
@@ -203,6 +205,7 @@ fun AddExpense(
         verticalArrangement = Arrangement.SpaceBetween
     ) {
         Column {
+            // TODO Handle selecting other users/group while coming from friend screen
             FlowRow(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -219,11 +222,6 @@ fun AddExpense(
                     state = chipEntryState,
                     textStyle = TextStyle(fontSize = 18.sp),
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                    onKeyboardAction = { performDefaultAction ->
-                        chips.add(chipEntryState.text.toString())
-                        chipEntryState.clearText()
-                        performDefaultAction()
-                    }
                 )
             }
             Column {
@@ -233,6 +231,7 @@ fun AddExpense(
                             chips.add(option.name)
                             chipEntryState.clearText()
                             filteredOptions.removeAt(index)
+                            onUserAdded(option)
                         }),
                         headlineContent = { Text(option.name) },
                         leadingContent = { Icon(Icons.Default.Person, "Person") }

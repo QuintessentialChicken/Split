@@ -59,6 +59,7 @@ class ExpensesViewModel @Inject constructor(
         }
 
     internal var selectedDate: Long? = null
+    var selectedUsers = mutableListOf<User>()
 
     private var _balance by mutableStateOf<List<UserBalance>>(emptyList())
     var balance: List<UserBalance>
@@ -78,7 +79,7 @@ class ExpensesViewModel @Inject constructor(
     val participants = expensesRepo.getAllParticipants()
     val users = userRepo.getAll()
 
-    private val _options = listOf(User(1, "Leon"), User(2, "Paula"))
+    private val _options = listOf(User(2, "Paula"), User(3, "Test"))
 
     private var _filteredOptions = mutableStateListOf<User>()
     var filteredOptions: SnapshotStateList<User>
@@ -134,20 +135,22 @@ class ExpensesViewModel @Inject constructor(
             println(amount.text.toString())
             userRepo.addUser(User(1, "Leon"))
             userRepo.addUser(User(2, "Paula"))
+            userRepo.addUser(User(3, "Test"))
             expensesRepo.addExpense(
                 Expense(
                     title = title.text.toString(),
                     amount = amount.text.toString().toInt(),
                     currencyCode = "EUR",
                     date = date,
-                    paidByUserId = 1
+                    paidByUserId = userId
                 ),
                 listOf(
-                    Participant(1, 0.5), Participant(2, 0.5)
+                    Participant(userId, 0.5), Participant(selectedUsers.first().userId, 0.5)
                 )
             )
+            selectedDate = null
+            selectedUsers.clear()
         }
-        selectedDate = null
         _currentUiState = UiState.HOME
     }
 
