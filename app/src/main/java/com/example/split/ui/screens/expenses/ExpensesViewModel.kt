@@ -1,10 +1,12 @@
 package com.example.split.ui.screens.expenses
 
 import androidx.compose.foundation.text.input.TextFieldState
-import androidx.compose.foundation.text.input.insert
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.split.data.Expense
@@ -15,19 +17,14 @@ import com.example.split.data.User
 import com.example.split.data.UsersRepository
 import com.example.split.utils.formatCurrency
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.time.Instant
-import java.time.LocalDate
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import javax.inject.Inject
-import kotlin.math.exp
 
-enum class State {
+enum class UiState {
     HOME,
     ADD
 }
@@ -54,11 +51,11 @@ class ExpensesViewModel @Inject constructor(
 
     val userId = 1L // TODO Replace with actual userId
 
-    private var _currentState by mutableStateOf(State.HOME)
-    var currentState: State
-        get() = _currentState
+    private var _currentUiState by mutableStateOf(UiState.HOME)
+    var currentUiState: UiState
+        get() = _currentUiState
         set(value) {
-            _currentState = value
+            _currentUiState = value
         }
 
     internal var selectedDate: Long? = null
@@ -81,12 +78,18 @@ class ExpensesViewModel @Inject constructor(
     val participants = expensesRepo.getAllParticipants()
     val users = userRepo.getAll()
 
-    private val chipOptions = listOf("Option1, Option2, Option3")
-    private val _filteredOptions = MutableStateFlow(chipOptions)
-    var filteredOptions: StateFlow<List<String>> = _filteredOptions
+    private val _options = listOf(User(1, "Leon"), User(2, "Paula"))
+
+    private var _filteredOptions = mutableStateListOf<User>()
+    var filteredOptions: SnapshotStateList<User>
+        get() = _filteredOptions
+        set(value) {
+            _filteredOptions = value
+        }
 
 
     init {
+        _filteredOptions.addAll(_options)
         viewModelScope.launch {
             combine(
                 expenses,
@@ -108,11 +111,15 @@ class ExpensesViewModel @Inject constructor(
 
     fun filterText(input: String) {
         // This filter returns the full items list when input is an empty string.
-        _filteredOptions.value = chipOptions.filter { it.contains(input, ignoreCase = true) }
+        _filteredOptions.clear()
+        _filteredOptions.addAll(
+            if (input.isBlank()) _options
+            else _options.filter { it.name.contains(input, ignoreCase = true) }
+        )
     }
 
     fun handleBackPress() {
-        _currentState = State.HOME
+        _currentUiState = UiState.HOME
     }
 
     fun confirmAdd(
@@ -120,7 +127,10 @@ class ExpensesViewModel @Inject constructor(
         amount: TextFieldState
     ) {
         viewModelScope.launch {
-            val date = if (selectedDate != null) selectedDate!! + (Instant.now().toEpochMilli() - ZonedDateTime.now(ZoneOffset.UTC).toLocalDate().atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli()) else Instant.now().toEpochMilli()
+            val date = if (selectedDate != null) selectedDate!! + (Instant.now()
+                .toEpochMilli() - ZonedDateTime.now(ZoneOffset.UTC).toLocalDate()
+                .atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli()) else Instant.now()
+                .toEpochMilli()
             println(amount.text.toString())
             userRepo.addUser(User(1, "Leon"))
             userRepo.addUser(User(2, "Paula"))
@@ -138,10 +148,8 @@ class ExpensesViewModel @Inject constructor(
             )
         }
         selectedDate = null
-        _currentState = State.HOME
+        _currentUiState = UiState.HOME
     }
-
-
 
 
     fun calculatePerExpense(
@@ -151,15 +159,24 @@ class ExpensesViewModel @Inject constructor(
     ): List<UIExpense> {
         val result = mutableListOf<UIExpense>()
         for (expense in expenses) {
-            val share = participants.find { participant -> participant.userId == userId }?.share ?: 0.0
-            result.add(UIExpense(
-                title = expense.title,
-                paidBy = users.find { user -> user.userId == expense.paidByUserId }?.name ?: "",
-                amountPaid = formatCurrency(expense.amount, expense.currencyCode),
-                amountOwed = if (expense.paidByUserId == userId) formatCurrency((expense.amount * share).toInt(), expense.currencyCode) else formatCurrency(expense.amount - (-share * expense.amount).toInt(), expense.currencyCode),
-                owes = expense.paidByUserId != userId,
-                paidOn = expense.date
-            ))
+            val share =
+                participants.find { participant -> participant.userId == userId }?.share ?: 0.0
+            result.add(
+                UIExpense(
+                    title = expense.title,
+                    paidBy = users.find { user -> user.userId == expense.paidByUserId }?.name ?: "",
+                    amountPaid = formatCurrency(expense.amount, expense.currencyCode),
+                    amountOwed = if (expense.paidByUserId == userId) formatCurrency(
+                        (expense.amount * share).toInt(),
+                        expense.currencyCode
+                    ) else formatCurrency(
+                        expense.amount - (-share * expense.amount).toInt(),
+                        expense.currencyCode
+                    ),
+                    owes = expense.paidByUserId != userId,
+                    paidOn = expense.date
+                )
+            )
         }
         return result
     }
@@ -179,37 +196,21 @@ class ExpensesViewModel @Inject constructor(
             for (participant in parts) {
                 if (expense.paidByUserId == userId && participant.userId != userId) {
                     // You paid for them → they owe you
-                    balances[participant.userId] = (balances.getOrDefault(participant.userId, 0) + (participant.share * expense.amount)).toInt()
+                    balances[participant.userId] = (balances.getOrDefault(
+                        participant.userId,
+                        0
+                    ) + (participant.share * expense.amount)).toInt()
                 }
 
                 if (participant.userId == userId && expense.paidByUserId != userId) {
                     // They paid for you → you owe them
-                    balances[expense.paidByUserId] = balances.getOrDefault(expense.paidByUserId, 0) - (participant.share * expense.amount).toInt()
+                    balances[expense.paidByUserId] = balances.getOrDefault(
+                        expense.paidByUserId,
+                        0
+                    ) - (participant.share * expense.amount).toInt()
                 }
             }
         }
         return balances
     }
-
-    fun calculateOwedByCurrentUser(
-        expense: Expense,
-        participants: List<ExpenseParticipant>,
-        currentUserId: Long
-    ): Double {
-        val currentUserShare = participants.find { it.userId == currentUserId }?.share ?: 0.0
-        if (currentUserShare == 0.0) return -1.0 // User is not involved, early exit
-
-        val userPaid = expense.paidByUserId == currentUserId
-
-        return if (userPaid) {
-            // User paid — subtract their own share to get what others owe them
-            val owedByOthers = 1 - currentUserShare
-            -owedByOthers  // Negative because others owe you
-        } else {
-            // User did not pay — they owe the payer
-            currentUserShare
-        }
-    }
-
-
 }
