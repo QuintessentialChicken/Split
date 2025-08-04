@@ -51,7 +51,7 @@ class ExpensesViewModel @Inject constructor(
 
     val userId = 1L // TODO Replace with actual userId
 
-    private var _currentUiState by mutableStateOf(UiState.HOME)
+    private var _currentUiState by mutableStateOf(UiState.ADD)
     var currentUiState: UiState
         get() = _currentUiState
         set(value) {
@@ -60,6 +60,7 @@ class ExpensesViewModel @Inject constructor(
 
     internal var selectedDate: Long? = null
     var selectedUsers = mutableListOf<User>()
+    var payer = User(-1, "")
 
     private var _balance by mutableStateOf<List<UserBalance>>(emptyList())
     var balance: List<UserBalance>
@@ -111,7 +112,6 @@ class ExpensesViewModel @Inject constructor(
     }
 
     fun filterText(input: String) {
-        println("HALLO")
         _filteredOptions.clear()
         _filteredOptions.addAll(
             if (input.isBlank()) _options

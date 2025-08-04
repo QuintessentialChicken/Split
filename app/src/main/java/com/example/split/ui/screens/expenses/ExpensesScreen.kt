@@ -2,6 +2,7 @@ package com.example.split.ui.screens.expenses
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -15,6 +16,7 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.TextFieldState
@@ -29,23 +31,27 @@ import androidx.compose.material.icons.filled.GroupAdd
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.InputChip
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
@@ -54,6 +60,7 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.split.FabState
 import com.example.split.IconWrapper
@@ -66,7 +73,6 @@ import com.example.split.ui.components.Debt
 import com.example.split.utils.CurrencyOutputTransformation
 import com.example.split.utils.DigitOnlyInputTransformation
 import com.example.split.utils.millisToDateString
-import kotlin.math.exp
 
 
 @OptIn(ExperimentalSharedTransitionApi::class, ExperimentalMaterial3Api::class)
@@ -177,9 +183,8 @@ fun ExpensesScreen(
                     viewModel.filteredOptions,
                     onDateSelected = { viewModel.selectedDate = it },
                     onUserAdded = { viewModel.selectedUsers.add(it) },
-                    onChipInput = {
-                        viewModel.filterText(it)
-                    })
+                    onChipInput = { viewModel.filterText(it) },
+                    onPayerSelected = { viewModel.payer = it })
             }
         }
     }
@@ -193,12 +198,14 @@ fun AddExpense(
     filteredOptions: MutableList<User>,
     onDateSelected: (date: Long?) -> Unit,
     onUserAdded: (User) -> Unit,
-    onChipInput: (String) -> Unit
+    onChipInput: (String) -> Unit,
+    onPayerSelected: (User) -> Unit
 ) {
     val chips = remember { mutableStateListOf<String>() }
     var chipEntryState = rememberTextFieldState()
-    var showPicker by remember { mutableStateOf(false) }
-    var expanded by remember { mutableStateOf(false) }
+    var showDatePicker by remember { mutableStateOf(false) }
+    var searchExpanded by remember { mutableStateOf(false) }
+    var showUserPicker by remember { mutableStateOf(true) }
 
     LaunchedEffect(chipEntryState.text) {
         onChipInput(chipEntryState.text.toString())
@@ -226,15 +233,16 @@ fun AddExpense(
                     InputChip(selected = true, onClick = {}, label = { Text(label) })
                 }
                 BasicTextField(
-                    modifier = Modifier.onFocusChanged({ focus ->
-                        if (focus.isFocused) expanded = true
-                    }),
+                    modifier = Modifier.onFocusChanged { focus ->
+                        searchExpanded = focus.isFocused
+                    },
                     state = chipEntryState,
                     textStyle = TextStyle(fontSize = 18.sp),
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                 )
             }
-            if (expanded) {
+            // TODO Make Suggestion list overlap but only to the keyboard
+            if (searchExpanded) {
                 Column {
                     filteredOptions.forEachIndexed { index, option ->
                         ListItem(
@@ -272,13 +280,22 @@ fun AddExpense(
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
             )
             // TODO Implement different splits
-            Button(
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 60.dp, vertical = 5.dp),
-                onClick = {}
+                    .padding(horizontal = 10.dp, vertical = 5.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Text("Gezahlt von dir und gleichmäßig geteilt")
+                Text("Gezahlt von ")
+                Button(onClick = {showUserPicker = true}) {
+                    Text("dir")
+                }
+                Text(" und ")
+                Button(onClick = {}) {
+                    Text("gleichmäßig")
+                }
+                Text(" geteilt ")
+
             }
         }
         Row(
@@ -295,7 +312,7 @@ fun AddExpense(
             )
             AssistChip(
                 leadingIcon = { Icon(Icons.Default.EditCalendar, "Add a date") },
-                onClick = { showPicker = true },
+                onClick = { showDatePicker = true },
                 label = { Text("29. Juli") }
             )
             AssistChip(
@@ -305,9 +322,37 @@ fun AddExpense(
             )
         }
     }
-    if (showPicker) {
+    if (showDatePicker) {
         DatePickerModal({ onDateSelected(it) }) {
-            showPicker = false
+            showDatePicker = false
+        }
+    }
+    if (showUserPicker) {
+        Dialog({showUserPicker = false}) {
+            Column (
+                modifier = Modifier
+                    .clip(RoundedCornerShape(10.dp, 10.dp, 10.dp, 10.dp))
+                    .background(MaterialTheme.colorScheme.surface)
+            ){
+                var selectedIndex by remember { mutableIntStateOf(0) }
+                Text(modifier = Modifier.padding(start = 15.dp, end = 15.dp, top = 15.dp, bottom = 8.dp ), text = "Wer hat bezahlt?", fontSize = 28.sp)
+                filteredOptions.forEachIndexed { index, user ->
+                    ListItem(
+                        modifier = Modifier.clickable(onClick = {
+                            onPayerSelected
+                            selectedIndex = index
+//                            showUserPicker = false
+                        }),
+                        headlineContent = { Text(user.name) },
+                        leadingContent = { Icon(Icons.Default.Person, "Person") },
+                        trailingContent = {
+                            if (index == selectedIndex) {
+                                Icon(Icons.Default.Done, "Selected")
+                            }
+                        }
+                    )
+                }
+            }
         }
     }
 }
