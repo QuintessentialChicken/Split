@@ -111,7 +111,7 @@ class ExpensesViewModel @Inject constructor(
     }
 
     fun filterText(input: String) {
-        // This filter returns the full items list when input is an empty string.
+        println("HALLO")
         _filteredOptions.clear()
         _filteredOptions.addAll(
             if (input.isBlank()) _options

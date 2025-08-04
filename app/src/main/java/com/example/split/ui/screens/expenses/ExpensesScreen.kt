@@ -46,6 +46,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
@@ -65,6 +66,7 @@ import com.example.split.ui.components.Debt
 import com.example.split.utils.CurrencyOutputTransformation
 import com.example.split.utils.DigitOnlyInputTransformation
 import com.example.split.utils.millisToDateString
+import kotlin.math.exp
 
 
 @OptIn(ExperimentalSharedTransitionApi::class, ExperimentalMaterial3Api::class)
@@ -175,7 +177,9 @@ fun ExpensesScreen(
                     viewModel.filteredOptions,
                     onDateSelected = { viewModel.selectedDate = it },
                     onUserAdded = { viewModel.selectedUsers.add(it) },
-                    onChipInput = { /*viewModel.filterText(it)*/ })
+                    onChipInput = {
+                        viewModel.filterText(it)
+                    })
             }
         }
     }
@@ -196,7 +200,10 @@ fun AddExpense(
     var showPicker by remember { mutableStateOf(false) }
     var expanded by remember { mutableStateOf(false) }
 
-    LaunchedEffect(chipEntryState) { onChipInput }
+    LaunchedEffect(chipEntryState.text) {
+        onChipInput(chipEntryState.text.toString())
+//        expanded = true
+    }
 
     Column(
         modifier = Modifier
@@ -219,23 +226,28 @@ fun AddExpense(
                     InputChip(selected = true, onClick = {}, label = { Text(label) })
                 }
                 BasicTextField(
+                    modifier = Modifier.onFocusChanged({ focus ->
+                        if (focus.isFocused) expanded = true
+                    }),
                     state = chipEntryState,
                     textStyle = TextStyle(fontSize = 18.sp),
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                 )
             }
-            Column {
-                filteredOptions.forEachIndexed { index, option ->
-                    ListItem(
-                        modifier = Modifier.clickable(onClick = {
-                            chips.add(option.name)
-                            chipEntryState.clearText()
-                            filteredOptions.removeAt(index)
-                            onUserAdded(option)
-                        }),
-                        headlineContent = { Text(option.name) },
-                        leadingContent = { Icon(Icons.Default.Person, "Person") }
-                    )
+            if (expanded) {
+                Column {
+                    filteredOptions.forEachIndexed { index, option ->
+                        ListItem(
+                            modifier = Modifier.clickable(onClick = {
+                                chips.add(option.name)
+                                chipEntryState.clearText()
+                                filteredOptions.removeAt(index)
+                                onUserAdded(option)
+                            }),
+                            headlineContent = { Text(option.name) },
+                            leadingContent = { Icon(Icons.Default.Person, "Person") }
+                        )
+                    }
                 }
             }
             HorizontalDivider(modifier = Modifier.padding(bottom = 20.dp))
@@ -259,6 +271,7 @@ fun AddExpense(
                 outputTransformation = CurrencyOutputTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
             )
+            // TODO Implement different splits
             Button(
                 modifier = Modifier
                     .fillMaxWidth()
