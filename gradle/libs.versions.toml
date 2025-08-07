@@ -14,6 +14,8 @@ ksp = "2.2.0-2.0.2"
 room = "2.7.2"
 hiltNavigationCompose = "1.2.0"
 material3 = "1.4.0-alpha18"
+firebaseAuth = "24.0.1"
+firebaseFirestore = "26.0.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -39,6 +41,8 @@ androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-com
 room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
 room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
 room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
+firebase-auth-ktx = { group = "com.google.firebase", name = "firebase-auth", version.ref = "firebaseAuth" }
+firebase-firestore-ktx = { group = "com.google.firebase", name = "firebase-firestore", version.ref = "firebaseFirestore" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

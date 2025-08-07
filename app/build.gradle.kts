@@ -52,6 +52,8 @@ dependencies {
     implementation (libs.androidx.hilt.navigation.compose)
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
+    implementation(libs.firebase.auth.ktx)
+    implementation(libs.firebase.firestore.ktx)
     ksp(libs.hilt.compiler)
     ksp(libs.room.compiler)
     implementation(libs.androidx.material.icons.extended)
