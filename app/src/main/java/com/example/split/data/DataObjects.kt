@@ -71,3 +71,9 @@ data class Participant(
     val userId: Long,
     val share: Double
 )
+
+data class FirestoreGroup(
+    val groupId: String,
+    val name: String,
+    val members: List<String>
+)

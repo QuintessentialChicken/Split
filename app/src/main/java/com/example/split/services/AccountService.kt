@@ -1,5 +1,6 @@
 package com.example.split.services
 
+import com.example.split.data.User
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.flow.Flow
 

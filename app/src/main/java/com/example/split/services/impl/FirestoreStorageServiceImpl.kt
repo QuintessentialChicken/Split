@@ -2,6 +2,7 @@ package com.example.split.services.impl
 
 import com.example.split.data.Expense
 import com.example.split.data.ExpenseParticipant
+import com.example.split.data.Group
 import com.example.split.data.Participant
 import com.example.split.data.User
 import com.example.split.services.AccountService
@@ -21,6 +22,10 @@ class FirestoreStorageServiceImpl @Inject constructor(
         usersRef.document(auth.currentUserId).set(user)
     }
 
+    override suspend fun addGroup(group: Group) {
+
+    }
+
     override fun getAllUsers(): Flow<List<User>> {
         TODO("Not yet implemented")
     }
@@ -29,7 +34,7 @@ class FirestoreStorageServiceImpl @Inject constructor(
         expense: Expense,
         participants: List<Participant>
     ) {
-        TODO("Not yet implemented")
+
     }
 
     override fun getExpenses(): Flow<List<Expense>> {
