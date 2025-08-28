@@ -5,33 +5,33 @@ import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class ExpensesRepository @Inject constructor(
-    private val local: StorageService
+    private val firestore: StorageService
 ) {
     fun getAll(): Flow<List<Expense>> {
-        return local.getExpenses()
+        return firestore.getExpenses()
     }
 
     fun getAllSortedByDateDesc(): Flow<List<Expense>> {
-        return local.getExpensesSortedByDateDesc()
+        return firestore.getExpensesSortedByDateDesc()
     }
 
     fun getAllParticipants(): Flow<List<ExpenseParticipant>> {
-        return local.getAllParticipants()
+        return firestore.getAllParticipants()
     }
 
     suspend fun addExpense(expense: Expense, participants: List<Participant>) {
-        local.addExpense(expense, participants)
+        firestore.addExpense(expense, participants)
     }
 }
 
 class UsersRepository @Inject constructor(
-    private val local: StorageService
+    private val firestore: StorageService
 ) {
     fun getAll(): Flow<List<User>> {
-        return local.getAllUsers()
+        return firestore.getAllUsers()
     }
 
     suspend fun addUser(user: User) {
-        local.addUser(user)
+        firestore.addUser(user)
     }
 }

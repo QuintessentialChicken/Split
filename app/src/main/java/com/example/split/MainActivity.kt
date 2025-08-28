@@ -50,6 +50,7 @@ import com.example.split.navigation.Expenses
 import com.example.split.navigation.setupNavGraph
 import com.example.split.ui.components.BottomBar
 import com.example.split.ui.theme.SplitTheme
+import com.google.firebase.FirebaseApp
 import dagger.hilt.android.AndroidEntryPoint
 
 
@@ -60,6 +61,7 @@ class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        FirebaseApp.initializeApp(this)
         enableEdgeToEdge()
         setContent {
             SplitTheme {
