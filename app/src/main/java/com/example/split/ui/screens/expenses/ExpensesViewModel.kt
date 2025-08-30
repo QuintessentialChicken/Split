@@ -12,6 +12,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.split.data.Expense
 import com.example.split.data.ExpenseParticipant
 import com.example.split.data.ExpensesRepository
+import com.example.split.data.FirestoreGroup
 import com.example.split.data.Participant
 import com.example.split.data.User
 import com.example.split.data.UsersRepository
@@ -76,10 +77,6 @@ class ExpensesViewModel @Inject constructor(
             _uiExpenses = value
         }
 
-    val expenses = expensesRepo.getAllSortedByDateDesc()
-    val participants = expensesRepo.getAllParticipants()
-    val users = userRepo.getAll()
-
     private val _options = listOf(User(2, "Paula"), User(3, "Test"))
 
     private var _filteredOptions = mutableStateListOf<User>()
@@ -89,27 +86,6 @@ class ExpensesViewModel @Inject constructor(
             _filteredOptions = value
         }
 
-
-    init {
-        _filteredOptions.addAll(_options)
-        viewModelScope.launch {
-            combine(
-                expenses,
-                participants,
-                users
-            ) { expenses, participants, users ->
-                val totalBalance = calculateBalance(expenses, participants)
-                val debtPerExpense = calculatePerExpense(expenses, participants, users)
-
-                totalBalance to debtPerExpense
-            }.collect { (totalBalance, deptPerExpense) ->
-                _balance = totalBalance
-                    .map { (userId, amount) -> UserBalance(userId, formatCurrency(amount)) }
-                    .sortedByDescending { it.amount }
-                _uiExpenses = deptPerExpense
-            }
-        }
-    }
 
     fun filterText(input: String) {
         _filteredOptions.clear()
@@ -133,10 +109,8 @@ class ExpensesViewModel @Inject constructor(
                 .atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli()) else Instant.now()
                 .toEpochMilli()
             println(amount.text.toString())
-            userRepo.addUser(User(1, "Leon"))
-            userRepo.addUser(User(2, "Paula"))
-            userRepo.addUser(User(3, "Test"))
-            expensesRepo.addExpense(
+
+            expensesRepo.addExpenseToGroup(
                 Expense(
                     title = title.text.toString(),
                     amount = amount.text.toString().toInt(),
@@ -144,9 +118,7 @@ class ExpensesViewModel @Inject constructor(
                     date = date,
                     paidByUserId = userId
                 ),
-                listOf(
-                    Participant(userId, 0.5), Participant(selectedUsers.first().userId, 0.5)
-                )
+                "1"
             )
             selectedDate = null
             selectedUsers.clear()
@@ -155,6 +127,14 @@ class ExpensesViewModel @Inject constructor(
     }
 
 
+    fun addGroup(
+        group: FirestoreGroup
+    ) {
+        viewModelScope.launch {
+
+            expensesRepo.addGroup(group)
+        }
+    }
     fun calculatePerExpense(
         expenses: List<Expense>,
         participants: List<ExpenseParticipant>,

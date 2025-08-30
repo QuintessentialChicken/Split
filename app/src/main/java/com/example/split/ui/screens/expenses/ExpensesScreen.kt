@@ -66,6 +66,8 @@ import com.example.split.FabState
 import com.example.split.IconWrapper
 import com.example.split.TopBarState
 import com.example.split.TopBarType
+import com.example.split.data.FirestoreGroup
+import com.example.split.data.Group
 import com.example.split.data.User
 import com.example.split.ui.components.DateIcon
 import com.example.split.ui.components.DatePickerModal
@@ -184,7 +186,9 @@ fun ExpensesScreen(
                     onDateSelected = { viewModel.selectedDate = it },
                     onUserAdded = { viewModel.selectedUsers.add(it) },
                     onChipInput = { viewModel.filterText(it) },
-                    onPayerSelected = { viewModel.payer = it })
+                    onPayerSelected = { viewModel.payer = it },
+                    onAddGroup = { viewModel.addGroup(it)}
+                )
             }
         }
     }
@@ -199,13 +203,15 @@ fun AddExpense(
     onDateSelected: (date: Long?) -> Unit,
     onUserAdded: (User) -> Unit,
     onChipInput: (String) -> Unit,
-    onPayerSelected: (User) -> Unit
+    onPayerSelected: (User) -> Unit,
+    onAddGroup: (FirestoreGroup) -> Unit
 ) {
     val chips = remember { mutableStateListOf<String>() }
     var chipEntryState = rememberTextFieldState()
     var showDatePicker by remember { mutableStateOf(false) }
     var searchExpanded by remember { mutableStateOf(false) }
     var showUserPicker by remember { mutableStateOf(true) }
+    var showGroupPicker by remember { mutableStateOf(true) }
 
     LaunchedEffect(chipEntryState.text) {
         onChipInput(chipEntryState.text.toString())
@@ -354,5 +360,39 @@ fun AddExpense(
                 }
             }
         }
+    }
+    val groups = listOf("Group1", "Group2")
+    if (showGroupPicker) {
+        val group: FirestoreGroup = FirestoreGroup("", "", listOf())
+
+        Dialog({
+            showGroupPicker = false
+            onAddGroup.invoke(group)
+        }) {
+            Column (
+                modifier = Modifier
+                    .clip(RoundedCornerShape(10.dp, 10.dp, 10.dp, 10.dp))
+                    .background(MaterialTheme.colorScheme.surface)
+            ) {
+                var selectedIndex by remember { mutableIntStateOf(0) }
+
+                groups.forEachIndexed { index, user ->
+                    ListItem(
+                        modifier = Modifier.clickable(onClick = {
+                            group.name = user
+                            group.groupId = "1"
+                            group.members = listOf<String>("Leon", user)
+                        }),
+                        headlineContent = { Text(user) },
+                        leadingContent = { Icon(Icons.Default.Person, "Person") },
+                        trailingContent = {
+                            if (index == selectedIndex) {
+                                Icon(Icons.Default.Done, "Selected")
+                            }
+                        }
+                    )
+                }
+
+            }        }
     }
 }

@@ -40,6 +40,6 @@ object RepositoryModule {
     @Provides
     @Singleton
     fun provideUserRepository(
-        firestore: StorageService
-    ): UsersRepository = UsersRepository(firestore)
+        auth: AccountService
+    ): UsersRepository = UsersRepository(auth)
 }

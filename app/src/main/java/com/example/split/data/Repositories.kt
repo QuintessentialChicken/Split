@@ -1,5 +1,6 @@
 package com.example.split.data
 
+import com.example.split.services.AccountService
 import com.example.split.services.StorageService
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
@@ -7,31 +8,15 @@ import javax.inject.Inject
 class ExpensesRepository @Inject constructor(
     private val firestore: StorageService
 ) {
-    fun getAll(): Flow<List<Expense>> {
-        return firestore.getExpenses()
-    }
-
-    fun getAllSortedByDateDesc(): Flow<List<Expense>> {
-        return firestore.getExpensesSortedByDateDesc()
-    }
-
-    fun getAllParticipants(): Flow<List<ExpenseParticipant>> {
-        return firestore.getAllParticipants()
-    }
-
-    suspend fun addExpense(expense: Expense, participants: List<Participant>) {
-        firestore.addExpense(expense, participants)
-    }
+    suspend fun addGroup(group: FirestoreGroup) = firestore.addGroup(group)
+    suspend fun addExpenseToGroup(expense: Expense, groupId: String) = firestore.addExpenseToGroup(expense, groupId)
+    fun getExpensesByGroup(groupId: String): Flow<List<Expense>> = firestore.getExpensesByGroup(groupId)
+    suspend fun deleteExpense(id: String) = firestore.deleteExpense(id)
+    suspend fun updateExpense(expense: Expense) = firestore.updateExpense(expense)
 }
 
 class UsersRepository @Inject constructor(
-    private val firestore: StorageService
+    private val auth: AccountService
 ) {
-    fun getAll(): Flow<List<User>> {
-        return firestore.getAllUsers()
-    }
 
-    suspend fun addUser(user: User) {
-        firestore.addUser(user)
-    }
 }

@@ -73,7 +73,7 @@ data class Participant(
 )
 
 data class FirestoreGroup(
-    val groupId: String,
-    val name: String,
-    val members: List<String>
+    var groupId: String,
+    var name: String,
+    var members: List<String>
 )

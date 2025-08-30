@@ -2,6 +2,7 @@ package com.example.split.services.impl
 
 import com.example.split.data.Expense
 import com.example.split.data.ExpenseParticipant
+import com.example.split.data.FirestoreGroup
 import com.example.split.data.Group
 import com.example.split.data.Participant
 import com.example.split.data.User
@@ -14,38 +15,21 @@ import javax.inject.Inject
 
 class FirestoreStorageServiceImpl @Inject constructor(
     private val auth: AccountService,
-    firestore: FirebaseFirestore,
+    private val firestore: FirebaseFirestore,
 ): StorageService {
-    private val usersRef: CollectionReference = firestore.collection("users")
-
-    override suspend fun addUser(user: User) {
-        usersRef.document(auth.currentUserId).set(user)
+    private val groupsRef: CollectionReference = firestore.collection("groups")
+    override suspend fun addGroup(group: FirestoreGroup) {
+        groupsRef.document().set(group)
     }
 
-    override suspend fun addGroup(group: Group) {
-
-    }
-
-    override fun getAllUsers(): Flow<List<User>> {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun addExpense(
+    override suspend fun addExpenseToGroup(
         expense: Expense,
-        participants: List<Participant>
+        groupId: String
     ) {
-
-    }
-
-    override fun getExpenses(): Flow<List<Expense>> {
         TODO("Not yet implemented")
     }
 
-    override fun getExpensesSortedByDateDesc(): Flow<List<Expense>> {
-        TODO("Not yet implemented")
-    }
-
-    override fun getAllParticipants(): Flow<List<ExpenseParticipant>> {
+    override fun getExpensesByGroup(groupId: String): Flow<List<Expense>> {
         TODO("Not yet implemented")
     }
 
@@ -56,4 +40,5 @@ class FirestoreStorageServiceImpl @Inject constructor(
     override suspend fun updateExpense(expense: Expense) {
         TODO("Not yet implemented")
     }
+
 }
