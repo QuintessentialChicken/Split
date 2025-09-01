@@ -21,10 +21,7 @@ import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import javax.inject.Inject
 
-enum class UiState {
-    HOME,
-    ADD
-}
+
 
 data class UserBalance(
     val userId: Long,
@@ -45,6 +42,10 @@ class ExpensesViewModel @Inject constructor(
     private val expensesRepo: ExpensesRepository,
     private val userRepo: UsersRepository
 ) : ViewModel() {
+    enum class UiState {
+        HOME,
+        ADD
+    }
 
     val userId = 1L // TODO Replace with actual userId
 

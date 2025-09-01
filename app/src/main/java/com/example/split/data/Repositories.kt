@@ -16,7 +16,10 @@ class ExpensesRepository @Inject constructor(
 }
 
 class UsersRepository @Inject constructor(
-    private val auth: AccountService
+    private val auth: AccountService,
+    private val firestore: StorageService
 ) {
-
+    suspend fun addUser(user: User) {
+        firestore.addUser(auth.currentUserId, user)
+    }
 }

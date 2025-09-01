@@ -70,6 +70,7 @@ import com.example.split.data.User
 import com.example.split.ui.components.DateIcon
 import com.example.split.ui.components.DatePickerModal
 import com.example.split.ui.components.Debt
+import com.example.split.ui.screens.expenses.ExpensesViewModel.UiState
 import com.example.split.utils.CurrencyOutputTransformation
 import com.example.split.utils.DigitOnlyInputTransformation
 import com.example.split.utils.millisToDateString

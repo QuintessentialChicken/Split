@@ -47,10 +47,10 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import com.example.split.navigation.Expenses
+import com.example.split.navigation.Friends
 import com.example.split.navigation.setupNavGraph
 import com.example.split.ui.components.BottomBar
 import com.example.split.ui.theme.SplitTheme
-import com.google.firebase.FirebaseApp
 import dagger.hilt.android.AndroidEntryPoint
 
 
@@ -85,7 +85,7 @@ class MainActivity : ComponentActivity() {
                 ) { innerPadding ->
                     NavHost(
                         navController = appState.navController,
-                        startDestination = Expenses.route,
+                        startDestination = Friends.route,
                         modifier = Modifier
                             .padding(innerPadding)
                             .consumeWindowInsets(innerPadding)

@@ -6,6 +6,7 @@ import com.example.split.services.AccountService
 import com.example.split.services.StorageService
 import com.example.split.services.impl.FirebaseAccountServiceImpl
 import com.example.split.services.impl.FirestoreStorageServiceImpl
+import com.google.android.gms.auth.api.signin.internal.Storage
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import dagger.Module
@@ -36,6 +37,7 @@ object RepositoryModule {
     @Provides
     @Singleton
     fun provideUserRepository(
-        auth: AccountService
-    ): UsersRepository = UsersRepository(auth)
+        auth: AccountService,
+        firestore: StorageService
+    ): UsersRepository = UsersRepository(auth, firestore)
 }
