@@ -1,46 +1,58 @@
 package com.example.split.services.impl
 
-import com.example.split.data.User
+import androidx.compose.ui.util.trace
 import com.example.split.services.AccountService
+import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 class FirebaseAccountServiceImpl @Inject constructor(
-    auth: FirebaseAuth
+    private val auth: FirebaseAuth
 ): AccountService {
     override val currentUserId: String
-        get() = TODO("Not yet implemented")
+        get() = auth.currentUser?.uid.orEmpty()
+
+    override val currentUserGetter
+        get() = auth.currentUser
     override val hasUser: Boolean
-        get() = TODO("Not yet implemented")
-    override val currentUserGetter: FirebaseUser?
-        get() = TODO("Not yet implemented")
-    override val currentUser: Flow<User>
-        get() = TODO("Not yet implemented")
+        get() = auth.currentUser != null
 
     override suspend fun authenticate(email: String, password: String) {
-        TODO("Not yet implemented")
+        auth.currentUser?.delete()
+        auth.signInWithEmailAndPassword(email, password).await()
     }
 
     override suspend fun sendRecoveryEmail(email: String) {
-        TODO("Not yet implemented")
+        auth.sendPasswordResetEmail(email).await()
     }
 
     override suspend fun createAnonymousAccount() {
-        TODO("Not yet implemented")
+        auth.signInAnonymously().await()
     }
 
-    override suspend fun linkAccount(email: String, password: String) {
-        TODO("Not yet implemented")
-    }
+    override suspend fun linkAccount(email: String, password: String): Unit =
+        trace(LINK_ACCOUNT_TRACE) {
+            val credential = EmailAuthProvider.getCredential(email, password)
+            auth.currentUser!!.linkWithCredential(credential).await()
+        }
 
     override suspend fun deleteAccount() {
-        TODO("Not yet implemented")
+        auth.currentUser!!.delete().await()
     }
 
     override suspend fun signOut() {
-        TODO("Not yet implemented")
+        if (auth.currentUser!!.isAnonymous) {
+            auth.currentUser!!.delete()
+        }
+        auth.signOut()
+
+        // Sign the user back in anonymously.
+        createAnonymousAccount()
+    }
+
+    companion object {
+        private const val LINK_ACCOUNT_TRACE = "linkAccount"
     }
 
 }

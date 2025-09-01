@@ -8,7 +8,7 @@ import javax.inject.Inject
 class ExpensesRepository @Inject constructor(
     private val firestore: StorageService
 ) {
-    suspend fun addGroup(group: FirestoreGroup) = firestore.addGroup(group)
+    suspend fun addGroup(group: Group) = firestore.addGroup(group)
     suspend fun addExpenseToGroup(expense: Expense, groupId: String) = firestore.addExpenseToGroup(expense, groupId)
     fun getExpensesByGroup(groupId: String): Flow<List<Expense>> = firestore.getExpensesByGroup(groupId)
     suspend fun deleteExpense(id: String) = firestore.deleteExpense(id)

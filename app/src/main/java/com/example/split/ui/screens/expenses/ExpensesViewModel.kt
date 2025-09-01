@@ -1,7 +1,6 @@
 package com.example.split.ui.screens.expenses
 
 import androidx.compose.foundation.text.input.TextFieldState
-import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -10,15 +9,12 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.split.data.Expense
-import com.example.split.data.ExpenseParticipant
 import com.example.split.data.ExpensesRepository
-import com.example.split.data.FirestoreGroup
-import com.example.split.data.Participant
+import com.example.split.data.Group
 import com.example.split.data.User
 import com.example.split.data.UsersRepository
 import com.example.split.utils.formatCurrency
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.ZoneOffset
@@ -61,7 +57,7 @@ class ExpensesViewModel @Inject constructor(
 
     internal var selectedDate: Long? = null
     var selectedUsers = mutableListOf<User>()
-    var payer = User(-1, "")
+    var payer = User("-1", "")
 
     private var _balance by mutableStateOf<List<UserBalance>>(emptyList())
     var balance: List<UserBalance>
@@ -77,7 +73,7 @@ class ExpensesViewModel @Inject constructor(
             _uiExpenses = value
         }
 
-    private val _options = listOf(User(2, "Paula"), User(3, "Test"))
+    private val _options = listOf(User("2", "Paula"), User("3", "Test"))
 
     private var _filteredOptions = mutableStateListOf<User>()
     var filteredOptions: SnapshotStateList<User>
@@ -128,72 +124,11 @@ class ExpensesViewModel @Inject constructor(
 
 
     fun addGroup(
-        group: FirestoreGroup
+        group: Group
     ) {
         viewModelScope.launch {
 
             expensesRepo.addGroup(group)
         }
-    }
-    fun calculatePerExpense(
-        expenses: List<Expense>,
-        participants: List<ExpenseParticipant>,
-        users: List<User>
-    ): List<UIExpense> {
-        val result = mutableListOf<UIExpense>()
-        for (expense in expenses) {
-            val share =
-                participants.find { participant -> participant.userId == userId }?.share ?: 0.0
-            result.add(
-                UIExpense(
-                    title = expense.title,
-                    paidBy = users.find { user -> user.userId == expense.paidByUserId }?.name ?: "",
-                    amountPaid = formatCurrency(expense.amount, expense.currencyCode),
-                    amountOwed = if (expense.paidByUserId == userId) formatCurrency(
-                        (expense.amount * share).toInt(),
-                        expense.currencyCode
-                    ) else formatCurrency(
-                        expense.amount - (-share * expense.amount).toInt(),
-                        expense.currencyCode
-                    ),
-                    owes = expense.paidByUserId != userId,
-                    paidOn = expense.date
-                )
-            )
-        }
-        return result
-    }
-
-    fun calculateBalance(
-        expenses: List<Expense>,
-        participants: List<ExpenseParticipant>
-    ): Map<Long, Int> {
-
-        // Group participants by expenseId for fast lookup
-        val partsByExpense = participants.groupBy { it.expenseId }
-
-        val balances = mutableMapOf<Long, Int>()
-
-        for (expense in expenses) {
-            val parts = partsByExpense[expense.expenseId] ?: continue
-            for (participant in parts) {
-                if (expense.paidByUserId == userId && participant.userId != userId) {
-                    // You paid for them → they owe you
-                    balances[participant.userId] = (balances.getOrDefault(
-                        participant.userId,
-                        0
-                    ) + (participant.share * expense.amount)).toInt()
-                }
-
-                if (participant.userId == userId && expense.paidByUserId != userId) {
-                    // They paid for you → you owe them
-                    balances[expense.paidByUserId] = balances.getOrDefault(
-                        expense.paidByUserId,
-                        0
-                    ) - (participant.share * expense.amount).toInt()
-                }
-            }
-        }
-        return balances
     }
 }

@@ -1,4 +1,4 @@
-package com.example.split.ui.screens
+package com.example.split.ui.screens.friends
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column

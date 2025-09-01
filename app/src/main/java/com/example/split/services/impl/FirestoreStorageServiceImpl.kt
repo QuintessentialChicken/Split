@@ -1,11 +1,7 @@
 package com.example.split.services.impl
 
 import com.example.split.data.Expense
-import com.example.split.data.ExpenseParticipant
-import com.example.split.data.FirestoreGroup
 import com.example.split.data.Group
-import com.example.split.data.Participant
-import com.example.split.data.User
 import com.example.split.services.AccountService
 import com.example.split.services.StorageService
 import com.google.firebase.firestore.CollectionReference
@@ -18,7 +14,7 @@ class FirestoreStorageServiceImpl @Inject constructor(
     private val firestore: FirebaseFirestore,
 ): StorageService {
     private val groupsRef: CollectionReference = firestore.collection("groups")
-    override suspend fun addGroup(group: FirestoreGroup) {
+    override suspend fun addGroup(group: Group) {
         groupsRef.document().set(group)
     }
 

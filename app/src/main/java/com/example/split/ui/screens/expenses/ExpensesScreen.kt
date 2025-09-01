@@ -31,7 +31,6 @@ import androidx.compose.material.icons.filled.GroupAdd
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -66,7 +65,6 @@ import com.example.split.FabState
 import com.example.split.IconWrapper
 import com.example.split.TopBarState
 import com.example.split.TopBarType
-import com.example.split.data.FirestoreGroup
 import com.example.split.data.Group
 import com.example.split.data.User
 import com.example.split.ui.components.DateIcon
@@ -204,7 +202,7 @@ fun AddExpense(
     onUserAdded: (User) -> Unit,
     onChipInput: (String) -> Unit,
     onPayerSelected: (User) -> Unit,
-    onAddGroup: (FirestoreGroup) -> Unit
+    onAddGroup: (Group) -> Unit
 ) {
     val chips = remember { mutableStateListOf<String>() }
     var chipEntryState = rememberTextFieldState()
@@ -363,7 +361,7 @@ fun AddExpense(
     }
     val groups = listOf("Group1", "Group2")
     if (showGroupPicker) {
-        val group: FirestoreGroup = FirestoreGroup("", "", listOf())
+        val group: Group = Group("", "", listOf())
 
         Dialog({
             showGroupPicker = false
