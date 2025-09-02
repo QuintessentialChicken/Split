@@ -22,4 +22,16 @@ class UsersRepository @Inject constructor(
     suspend fun addUser(user: User) {
         firestore.addUser(auth.currentUserId, user)
     }
+
+    suspend fun getCurrentUser(): User? {
+//        return firestore.getUserById(auth.currentUserId)
+        return firestore.getUserById("2")
+    }
+
+    suspend fun getUserById(id: String): User? {
+        return firestore.getUserById(id)
+    }
+    suspend fun getUserByFriendCode(code: String): User? {
+        return firestore.getUserByFriendCode(code)
+    }
 }

@@ -362,7 +362,7 @@ fun AddExpense(
     }
     val groups = listOf("Group1", "Group2")
     if (showGroupPicker) {
-        val group: Group = Group("", "", listOf())
+        val group: Group = Group("", listOf())
 
         Dialog({
             showGroupPicker = false
@@ -379,7 +379,6 @@ fun AddExpense(
                     ListItem(
                         modifier = Modifier.clickable(onClick = {
                             group.name = user
-                            group.groupId = "1"
                             group.members = listOf<String>("Leon", user)
                         }),
                         headlineContent = { Text(user) },

@@ -7,7 +7,9 @@ import com.example.split.services.AccountService
 import com.example.split.services.StorageService
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.toObject
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 class FirestoreStorageServiceImpl @Inject constructor(
@@ -19,6 +21,23 @@ class FirestoreStorageServiceImpl @Inject constructor(
 
     override suspend fun addUser(id: String, user: User) {
         usersRef.document("1").set(user)
+    }
+
+    override suspend fun getUserById(id: String): User? {
+        if (id == "") {
+            println("ASDASDAS")
+            return null
+        }
+        val result = usersRef.document(id).get().await()
+        return result.toObject<User>()
+    }
+
+    override suspend fun getUserByFriendCode(code: String): User? {
+        val users = usersRef
+            .whereEqualTo("friendCode", code)
+            .get()
+            .await()
+        return if (users.isEmpty) null else users.first().toObject<User>()
     }
 
     override suspend fun addGroup(group: Group) {

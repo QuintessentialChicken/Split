@@ -69,7 +69,7 @@ fun FriendsScreen(
 
 @Composable
 fun AddFriend(modifier: Modifier = Modifier, onAdd: (String) -> Unit) {
-    var code = rememberTextFieldState()
+    val code = rememberTextFieldState()
 
     Column(
         modifier = modifier.padding(horizontal = 10.dp),

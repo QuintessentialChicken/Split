@@ -7,6 +7,10 @@ import kotlinx.coroutines.flow.Flow
 
 interface StorageService {
     suspend fun addUser(id: String, user: User)
+
+    suspend fun getUserById(id: String): User?
+
+    suspend fun getUserByFriendCode(code: String): User?
     suspend fun addGroup(group: Group)
     suspend fun addExpenseToGroup(expense: Expense, groupId: String)
     fun getExpensesByGroup(groupId: String): Flow<List<Expense>>

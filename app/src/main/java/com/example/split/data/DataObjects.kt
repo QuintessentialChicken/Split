@@ -1,8 +1,8 @@
 package com.example.split.data
 
 data class User(
-    val name: String,
-    val friendCode: String,
+    val name: String = "",
+    val friendCode: String = "",
 )
 
 data class Expense(
@@ -15,7 +15,6 @@ data class Expense(
 )
 
 data class Group(
-    var groupId: String,
     var name: String,
     var members: List<String>
 )

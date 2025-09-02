@@ -6,6 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.split.data.ExpensesRepository
+import com.example.split.data.Group
 import com.example.split.data.User
 import com.example.split.data.UsersRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -36,7 +37,18 @@ class FriendsViewModel @Inject constructor(
 
     // TODO Get User by friend code, create group and add current user id and friend user id as members
     fun addFriend(code: String) {
-        println(code)
 
+        viewModelScope.launch {
+            val friend = userRepo.getUserByFriendCode(code)
+            val currentUser = userRepo.getCurrentUser()
+            if (friend != null && currentUser != null) {
+                expensesRepo.addGroup(
+                    Group(
+                        friend.name,
+                        listOf(currentUser.name, friend.name)
+                    )
+                )
+            }
+        }
     }
 }
