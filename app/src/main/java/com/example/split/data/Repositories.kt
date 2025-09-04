@@ -10,6 +10,8 @@ class ExpensesRepository @Inject constructor(
 ) {
     suspend fun addGroup(group: Group) = firestore.addGroup(group)
     suspend fun addExpenseToGroup(expense: Expense, groupId: String) = firestore.addExpenseToGroup(expense, groupId)
+
+    suspend fun getGroupsByUserId(id: String) = firestore.getGroupsByUserId(id)
     fun getExpensesByGroup(groupId: String): Flow<List<Expense>> = firestore.getExpensesByGroup(groupId)
     suspend fun deleteExpense(id: String) = firestore.deleteExpense(id)
     suspend fun updateExpense(expense: Expense) = firestore.updateExpense(expense)
@@ -31,6 +33,7 @@ class UsersRepository @Inject constructor(
     suspend fun getUserById(id: String): User? {
         return firestore.getUserById(id)
     }
+
     suspend fun getUserByFriendCode(code: String): User? {
         return firestore.getUserByFriendCode(code)
     }

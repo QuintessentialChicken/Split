@@ -15,6 +15,6 @@ data class Expense(
 )
 
 data class Group(
-    var name: String,
-    var members: List<String>
+    var name: String = "",
+    var members: List<String> = emptyList()
 )

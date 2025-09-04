@@ -10,6 +10,8 @@ import com.example.split.data.Group
 import com.example.split.data.User
 import com.example.split.data.UsersRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -29,6 +31,19 @@ class FriendsViewModel @Inject constructor(
         set(value) {
             _currentUiState = value
         }
+
+    private val _groups = MutableStateFlow<List<Group>>(emptyList())
+    val groups: StateFlow<List<Group>> = _groups
+
+    fun loadGroups(userId: String) {
+        println("REFRESHING")
+        viewModelScope.launch {
+            val result = expensesRepo.getGroupsByUserId(userId)
+            _groups.value = result
+        }.invokeOnCompletion {
+            println(_groups.value)
+        }
+    }
 
     fun DEBUG_AddUser() {
         viewModelScope.launch { userRepo.addUser(User("Paula", "ABCDFGHI")) }

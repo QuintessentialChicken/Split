@@ -8,6 +8,7 @@ import com.example.split.services.StorageService
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.toObject
+import com.google.firebase.firestore.toObjects
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
@@ -49,6 +50,14 @@ class FirestoreStorageServiceImpl @Inject constructor(
         groupId: String
     ) {
         TODO("Not yet implemented")
+    }
+
+    override suspend fun getGroupsByUserId(id: String): List<Group> {
+        val groups = groupsRef
+            .whereArrayContains("members", id)
+            .get()
+            .await()
+        return groups.toObjects<Group>()
     }
 
     override fun getExpensesByGroup(groupId: String): Flow<List<Expense>> {
