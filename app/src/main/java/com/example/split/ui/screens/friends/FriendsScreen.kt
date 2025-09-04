@@ -37,6 +37,7 @@ import com.example.split.IconWrapper
 import com.example.split.TopBarState
 import com.example.split.navigation.Expenses
 import com.example.split.ui.components.Debt
+import com.example.split.ui.components.GroupLazyList
 import com.example.split.ui.screens.friends.FriendsViewModel.UiState
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -49,29 +50,19 @@ fun FriendsScreen(
 ) {
     when (viewModel.currentUiState) {
         UiState.HOME -> {
-            val groups by viewModel.groups.collectAsState()
-            val isRefreshing = false
             setTopBar(
                 TopBarState(
                     title = "Friends",
                     actionIcon = IconWrapper(Icons.Default.PersonAdd, contentDescription = "Add a Friend", { viewModel.currentUiState = UiState.ADD })
                 )
             )
-            PullToRefreshBox(
-                isRefreshing = isRefreshing,
-                onRefresh = { viewModel.loadGroups("1") },
-            ) {
-                LazyColumn (modifier = Modifier.fillMaxSize()){
-                    items(groups) { group ->
-                        ListItem(
-                            modifier = modifier.clickable(onClick = { navigate(Expenses.route) }),
-                            headlineContent = { Text(group.name) },
-                            trailingContent = { Debt(amount = "10€", owes = true) },
-                        )
-                    }
-                }
-//                Button(onClick = {viewModel.DEBUG_AddUser()}) { Text("Add User")}
-            }
+            val friends by viewModel.friends.collectAsState()
+
+            GroupLazyList(
+                onRefresh = { viewModel.loadFriends("2") },
+                onClick = { navigate(it) }, 
+                groups = friends,
+            )
         }
 
         UiState.ADD -> {

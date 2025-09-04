@@ -12,6 +12,7 @@ class ExpensesRepository @Inject constructor(
     suspend fun addExpenseToGroup(expense: Expense, groupId: String) = firestore.addExpenseToGroup(expense, groupId)
 
     suspend fun getGroupsByUserId(id: String) = firestore.getGroupsByUserId(id)
+    suspend fun getFriendsByUserId(id: String) = firestore.getFriendsByUserId(id)
     fun getExpensesByGroup(groupId: String): Flow<List<Expense>> = firestore.getExpensesByGroup(groupId)
     suspend fun deleteExpense(id: String) = firestore.deleteExpense(id)
     suspend fun updateExpense(expense: Expense) = firestore.updateExpense(expense)
@@ -21,20 +22,8 @@ class UsersRepository @Inject constructor(
     private val auth: AccountService,
     private val firestore: StorageService
 ) {
-    suspend fun addUser(user: User) {
-        firestore.addUser(auth.currentUserId, user)
-    }
-
-    suspend fun getCurrentUser(): User? {
-//        return firestore.getUserById(auth.currentUserId)
-        return firestore.getUserById("2")
-    }
-
-    suspend fun getUserById(id: String): User? {
-        return firestore.getUserById(id)
-    }
-
-    suspend fun getUserByFriendCode(code: String): User? {
-        return firestore.getUserByFriendCode(code)
-    }
+    suspend fun addUser(user: User) = firestore.addUser(auth.currentUserId, user)
+    suspend fun getCurrentUser(): User? = firestore.getUserById("2")
+    suspend fun getUserById(id: String): User? = firestore.getUserById(id)
+    suspend fun getUserByFriendCode(code: String): User? = firestore.getUserByFriendCode(code)
 }

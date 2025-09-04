@@ -32,16 +32,16 @@ class FriendsViewModel @Inject constructor(
             _currentUiState = value
         }
 
-    private val _groups = MutableStateFlow<List<Group>>(emptyList())
-    val groups: StateFlow<List<Group>> = _groups
+    private val _friends = MutableStateFlow<List<Group>>(emptyList())
+    val friends: StateFlow<List<Group>> = _friends
 
-    fun loadGroups(userId: String) {
+    fun loadFriends(userId: String) {
         println("REFRESHING")
         viewModelScope.launch {
-            val result = expensesRepo.getGroupsByUserId(userId)
-            _groups.value = result
+            val result = expensesRepo.getFriendsByUserId(userId)
+            _friends.value = result
         }.invokeOnCompletion {
-            println(_groups.value)
+            println(_friends.value)
         }
     }
 

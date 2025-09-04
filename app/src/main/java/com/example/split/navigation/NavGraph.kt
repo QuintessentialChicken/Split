@@ -5,7 +5,7 @@ import androidx.navigation.compose.composable
 import com.example.split.SplitAppState
 import com.example.split.ui.screens.AccountScreen
 import com.example.split.ui.screens.friends.FriendsScreen
-import com.example.split.ui.screens.GroupsScreen
+import com.example.split.ui.screens.groups.GroupsScreen
 import com.example.split.ui.screens.expenses.ExpensesScreen
 
 fun NavGraphBuilder.setupNavGraph(

@@ -54,6 +54,16 @@ class FirestoreStorageServiceImpl @Inject constructor(
 
     override suspend fun getGroupsByUserId(id: String): List<Group> {
         val groups = groupsRef
+            .whereGreaterThan("memberCount", 2)
+            .whereArrayContains("members", id)
+            .get()
+            .await()
+        return groups.toObjects<Group>()
+    }
+
+    override suspend fun getFriendsByUserId(id: String): List<Group> {
+        val groups = groupsRef
+            .whereEqualTo("memberCount", 2)
             .whereArrayContains("members", id)
             .get()
             .await()
