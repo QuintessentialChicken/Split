@@ -1,5 +1,6 @@
 package com.example.split
 
+import android.app.Activity
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -50,17 +51,30 @@ import com.example.split.navigation.Expenses
 import com.example.split.navigation.Friends
 import com.example.split.navigation.setupNavGraph
 import com.example.split.ui.components.BottomBar
+import com.example.split.ui.screens.splash.SplashViewModel
 import com.example.split.ui.theme.SplitTheme
 import dagger.hilt.android.AndroidEntryPoint
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import javax.inject.Inject
 
 
 val TESTING = false
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    @Inject
+    lateinit var splashViewModel: SplashViewModel
+
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
+
+        installSplashScreen().setKeepOnScreenCondition {
+            splashViewModel.isLoading.value
+        }
+
         enableEdgeToEdge()
         setContent {
             SplitTheme {
