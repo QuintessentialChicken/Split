@@ -75,7 +75,6 @@ class MainActivity : ComponentActivity() {
             splashViewModel.isLoading.value
         }
 
-        enableEdgeToEdge()
         setContent {
             SplitTheme {
                 val appState = rememberAppState()

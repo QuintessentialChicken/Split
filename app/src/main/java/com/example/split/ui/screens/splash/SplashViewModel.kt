@@ -1,5 +1,6 @@
 package com.example.split.ui.screens.splash
 
+import android.os.SystemClock
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
