@@ -6,12 +6,12 @@ data class User(
 )
 
 data class Expense(
-    val title: String,
-    val amount: Int,
-    val currencyCode: String,
-    val date: Long,
-    val paidByUserId: Long,
-    val groupId: Long? = null  // null if not part of a group
+    val title: String = "",
+    val amount: Int = 0,
+    val currencyCode: String = "",
+    val date: Long = 0,
+    val paidByUserId: String = "",
+    val groupId: String? = null  // null if not part of a group
 )
 
 data class Group(

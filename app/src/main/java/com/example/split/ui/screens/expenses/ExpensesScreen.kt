@@ -42,6 +42,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
@@ -84,6 +85,7 @@ fun ExpensesScreen(
     setFab: (FabState?) -> Unit,
     setTopBar: (TopBarState?) -> Unit
 ) {
+    val expenses by viewModel.expenses.collectAsState()
     LaunchedEffect(Unit) {
         setFab(
             FabState(
@@ -119,8 +121,8 @@ fun ExpensesScreen(
                 )
                 LazyColumn {
                     var lastDate = "Jun 1970"
-                    items(viewModel.uiExpenses) { expense ->
-                        val currentDate = millisToDateString(expense.paidOn, "MMMM yyyy")
+                    items(expenses) { expense ->
+                        val currentDate = millisToDateString(expense.date, "MMMM yyyy")
                         if (currentDate != lastDate) {
                             Row(
                                 modifier = Modifier
@@ -150,13 +152,13 @@ fun ExpensesScreen(
                                 )
                             }
                         }
-                        val payer = if (expense.owes) expense.paidBy + "hat" else "Du hast"
+//                        val payer = if (expense.owes) expense.paidBy + "hat" else "Du hast"
                         ListItem(
                             headlineContent = { Text(expense.title) },
-                            supportingContent = { Text("$payer ${expense.amountPaid} gezahlt") },
-                            leadingContent = { DateIcon(timestamp = expense.paidOn) },
+//                            supportingContent = { Text("$payer ${expense.amountPaid} gezahlt") },
+                            leadingContent = { DateIcon(timestamp = expense.date) },
                             trailingContent = {
-                                Debt(amount = expense.amountOwed, owes = expense.owes)
+//                                Debt(amount = expense.amountOwed, owes = expense.owes)
                             },
                         )
                         lastDate = currentDate

@@ -15,6 +15,9 @@ import com.example.split.data.User
 import com.example.split.data.UsersRepository
 import com.example.split.utils.formatCurrency
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.ZoneOffset
@@ -47,9 +50,9 @@ class ExpensesViewModel @Inject constructor(
         ADD
     }
 
-    val userId = 1L // TODO Replace with actual userId
+    val userId = "1" // TODO Replace with actual userId
 
-    private var _currentUiState by mutableStateOf(UiState.ADD)
+    private var _currentUiState by mutableStateOf(UiState.HOME)
     var currentUiState: UiState
         get() = _currentUiState
         set(value) {
@@ -73,6 +76,8 @@ class ExpensesViewModel @Inject constructor(
         set(value) {
             _uiExpenses = value
         }
+
+    val expenses: StateFlow<List<Expense>> = expensesRepo.getExpensesByGroup("A2zZCcXnbNy1iQVdcKA8").stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
     private val _options = listOf(User("2", "Paula"), User("3", "Test"))
 

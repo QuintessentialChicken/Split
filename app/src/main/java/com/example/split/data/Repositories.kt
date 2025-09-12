@@ -13,7 +13,7 @@ class ExpensesRepository @Inject constructor(
 
     suspend fun getGroupsByUserId(id: String) = firestore.getGroupsByUserId(id)
     suspend fun getFriendsByUserId(id: String) = firestore.getFriendsByUserId(id)
-    fun getExpensesByGroup(groupId: String): Flow<List<Expense>> = firestore.getExpensesByGroup(groupId)
+    fun getExpensesByGroup(groupId: String): Flow<List<Expense>> = firestore.getExpensesFlow(groupId)
     suspend fun deleteExpense(id: String) = firestore.deleteExpense(id)
     suspend fun updateExpense(expense: Expense) = firestore.updateExpense(expense)
 }

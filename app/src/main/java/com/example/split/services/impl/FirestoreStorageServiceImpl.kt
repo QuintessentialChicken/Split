@@ -19,6 +19,7 @@ import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 const val TAG = "FirestoreStorageServiceImpl"
+
 class FirestoreStorageServiceImpl @Inject constructor(
     private val auth: AccountService,
     private val firestore: FirebaseFirestore,
@@ -77,21 +78,17 @@ class FirestoreStorageServiceImpl @Inject constructor(
     }
 
     override fun getExpensesFlow(groupId: String): Flow<List<Expense>> = callbackFlow {
-        val registration = groupsRef.document(groupId).collection("expenses").orderBy("date", Query.Direction.ASCENDING).addSnapshotListener { snapshot, e ->
-            if (e != null) {
-                Log.w(TAG, "Listen failed.", e)
-                close(e)
-                return@addSnapshotListener
-            }
-
-            if (snapshot != null) {
-                val expenses = snapshot.documents.mapNotNull { doc ->
-                    doc.toObject(Expense::class.java)
+        val registration =
+            groupsRef.document(groupId).collection("expenses").orderBy("date", Query.Direction.ASCENDING).addSnapshotListener { snapshot, e ->
+                if (e != null) {
+                    Log.w(TAG, "Listen failed.", e)
+                    close(e)
+                    return@addSnapshotListener
                 }
+
+                val expenses = snapshot?.toObjects(Expense::class.java) ?: emptyList()
                 trySend(expenses)
             }
-        }
-
         awaitClose { registration.remove() }
     }
 
