@@ -74,7 +74,10 @@ import com.example.split.ui.components.Debt
 import com.example.split.ui.screens.expenses.ExpensesViewModel.UiState
 import com.example.split.utils.CurrencyOutputTransformation
 import com.example.split.utils.DigitOnlyInputTransformation
+import com.example.split.utils.formatCurrency
 import com.example.split.utils.millisToDateString
+import kotlin.math.absoluteValue
+import kotlin.math.exp
 
 
 @OptIn(ExperimentalSharedTransitionApi::class, ExperimentalMaterial3Api::class)
@@ -85,18 +88,10 @@ fun ExpensesScreen(
     setFab: (FabState?) -> Unit,
     setTopBar: (TopBarState?) -> Unit
 ) {
-//    LaunchedEffect(Unit) {
-//        setFab(
-//            FabState(
-//                Icons.Default.Add,
-//                contentDescription = "Add Expense",
-//                onClick = { viewModel.currentUiState = UiState.ADD })
-//        )
-//    }
-
     BackHandler(enabled = viewModel.currentUiState == UiState.ADD) { viewModel.handleBackPress() }
 
-    val expenses by viewModel.uiExpenses.collectAsState(initial = emptyList())
+    val expensesUiState by viewModel.expensesUiState.collectAsState(initial = ExpensesUiState(emptyList(), 0))
+    val subtitle = if (expensesUiState.totalOwed < 0) "Du schuldest ${formatCurrency(expensesUiState.totalOwed.absoluteValue)}" else "schuldet dir ${formatCurrency(expensesUiState.totalOwed.absoluteValue)}"
     Column(
         modifier
             .fillMaxSize()
@@ -106,7 +101,7 @@ fun ExpensesScreen(
                 setTopBar(
                     TopBarState(
                         title = "Paula Seidel",
-                        subtitle = "schuldet dir ${viewModel.balance.firstOrNull()?.amount ?: "0.00€"}",
+                        subtitle = subtitle,
                         type = TopBarType.LARGE,
                         scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
                     )
@@ -120,7 +115,7 @@ fun ExpensesScreen(
                 )
                 LazyColumn {
                     var lastDate = "Jun 1970"
-                    items(expenses) { expense ->
+                    items(expensesUiState.expenses) { expense ->
                         val currentDate = millisToDateString(expense.paidOn, "MMMM yyyy")
                         if (currentDate != lastDate) {
                             Row(

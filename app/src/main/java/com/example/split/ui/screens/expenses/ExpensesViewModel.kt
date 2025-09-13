@@ -13,6 +13,7 @@ import com.example.split.data.ExpensesRepository
 import com.example.split.data.Group
 import com.example.split.data.User
 import com.example.split.data.UsersRepository
+import com.example.split.navigation.Expenses
 import com.example.split.utils.formatCurrency
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
@@ -43,6 +44,11 @@ data class UIExpense(
     val paidOn: Long,
 )
 
+data class ExpensesUiState(
+    val expenses: List<UIExpense>,
+    val totalOwed: Int
+)
+
 @HiltViewModel
 class ExpensesViewModel @Inject constructor(
     private val expensesRepo: ExpensesRepository,
@@ -66,21 +72,21 @@ class ExpensesViewModel @Inject constructor(
     var selectedUsers = mutableListOf<User>()
     var payer = User("-1", "")
 
-    private var _balance by mutableStateOf<List<UserBalance>>(emptyList())
-    var balance: List<UserBalance>
-        get() = _balance
-        set(value) {
-            _balance = value
-        }
-
-    val uiExpenses: StateFlow<List<UIExpense>> = expensesRepo.getExpensesByGroup("A2zZCcXnbNy1iQVdcKA8")
+    val expensesUiState: StateFlow<ExpensesUiState> = expensesRepo.getExpensesByGroup("A2zZCcXnbNy1iQVdcKA8")
         .map { expenses ->
             val currentUser = userRepo.getCurrentUserId()
-            expenses.map { expense ->
+            var total = 0
+
+            val uiList = expenses.map { expense ->
+                val share = expense.participants[currentUser] ?: 0.0f
                 val paidByCurrentUser = expense.paidByUserId == userRepo.getCurrentUserId()
-                println(expense.participants)
-                println(currentUser)
-                val amountOwed: Int = (if (paidByCurrentUser) expense.amount - (expense.amount * expense.participants[currentUser]!!) else -expense.amount * expense.participants[currentUser]!!).roundToInt()
+                val rawAmountOwed = if (paidByCurrentUser) {
+                    expense.amount - (expense.amount * share)
+                } else {
+                    -expense.amount * share
+                }
+                val amountOwed = rawAmountOwed.roundToInt()
+                total += amountOwed
 
                 UIExpense(
                     title = expense.title,
@@ -91,9 +97,12 @@ class ExpensesViewModel @Inject constructor(
                     paidOn = expense.date,
                 )
             }
-        }
-        .stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
+            ExpensesUiState(
+                expenses = uiList,
+                totalOwed = total
+            )
+        }.stateIn(viewModelScope, SharingStarted.Eagerly, ExpensesUiState(emptyList(), 0))
 
     private val _options = listOf(User("2", "Paula"), User("3", "Test"))
 
