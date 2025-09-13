@@ -28,10 +28,9 @@ fun GroupsScreen(
 ) {
     setTopBar(TopBarState(title = "Groups", actionIcon = IconWrapper(Icons.Default.GroupAdd, contentDescription = "Add a Friend", {})))
 
-    val groups by viewModel.groups.collectAsState()
+    val groups by viewModel.groups.collectAsState(initial = emptyList())
 
     GroupLazyList(
-        onRefresh = { viewModel.loadGroups("2") },
         onClick = { navigate(it) },
         groups = groups,
     )

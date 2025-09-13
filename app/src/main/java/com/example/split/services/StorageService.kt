@@ -16,6 +16,8 @@ interface StorageService {
     suspend fun addExpenseToGroup(expense: Expense, groupId: String)
 
     suspend fun getGroupsByUserId(id: String): List<Group>
+
+    fun getGroupsFlow(id: String, isFriend: Boolean): Flow<List<Group>>
     suspend fun getFriendsByUserId(id: String): List<Group>
     fun getExpensesFlow(groupId: String): Flow<List<Expense>>
     suspend fun getExpensesCashed(groupId: String): List<Expense>

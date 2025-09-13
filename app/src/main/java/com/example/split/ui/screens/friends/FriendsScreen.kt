@@ -48,6 +48,8 @@ fun FriendsScreen(
     navigate: (String) -> Unit,
     setTopBar: (TopBarState?) -> Unit
 ) {
+    val friends by viewModel.friends.collectAsState(initial = emptyList())
+
     when (viewModel.currentUiState) {
         UiState.HOME -> {
             setTopBar(
@@ -56,11 +58,9 @@ fun FriendsScreen(
                     actionIcon = IconWrapper(Icons.Default.PersonAdd, contentDescription = "Add a Friend", { viewModel.currentUiState = UiState.ADD })
                 )
             )
-            val friends by viewModel.friends.collectAsState()
 
             GroupLazyList(
-                onRefresh = { viewModel.loadFriends("2") },
-                onClick = { navigate(it) }, 
+                onClick = { navigate(it) },
                 groups = friends,
             )
         }

@@ -12,6 +12,8 @@ class ExpensesRepository @Inject constructor(
     suspend fun addExpenseToGroup(expense: Expense, groupId: String) = firestore.addExpenseToGroup(expense, groupId)
 
     suspend fun getGroupsByUserId(id: String) = firestore.getGroupsByUserId(id)
+
+    fun getGroupsFlow(id: String, isFriend: Boolean) = firestore.getGroupsFlow(id, isFriend)
     suspend fun getFriendsByUserId(id: String) = firestore.getFriendsByUserId(id)
     fun getExpensesByGroup(groupId: String): Flow<List<Expense>> = firestore.getExpensesFlow(groupId)
     suspend fun deleteExpense(id: String) = firestore.deleteExpense(id)

@@ -85,14 +85,14 @@ fun ExpensesScreen(
     setFab: (FabState?) -> Unit,
     setTopBar: (TopBarState?) -> Unit
 ) {
-    LaunchedEffect(Unit) {
-        setFab(
-            FabState(
-                Icons.Default.Add,
-                contentDescription = "Add Expense",
-                onClick = { viewModel.currentUiState = UiState.ADD })
-        )
-    }
+//    LaunchedEffect(Unit) {
+//        setFab(
+//            FabState(
+//                Icons.Default.Add,
+//                contentDescription = "Add Expense",
+//                onClick = { viewModel.currentUiState = UiState.ADD })
+//        )
+//    }
 
     BackHandler(enabled = viewModel.currentUiState == UiState.ADD) { viewModel.handleBackPress() }
 

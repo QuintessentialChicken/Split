@@ -34,9 +34,9 @@ fun DateIcon(
     timestamp: Long
 ) {
     val dateString = millisToDateString(timestamp, "d MMM yyyy").split(" ")
-    Column (
+    Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-    ){
+    ) {
         Text(modifier = Modifier.offset(y = 2.dp), text = dateString[0])
         Text(dateString[1])
     }
@@ -46,24 +46,17 @@ fun DateIcon(
 @Composable
 fun GroupLazyList(
     modifier: Modifier = Modifier,
-    onRefresh: () -> Unit,
     onClick: (route: String) -> Unit,
     groups: List<Group>
 ) {
-    val isRefreshing = false
-
-    PullToRefreshBox(
-        isRefreshing = isRefreshing,
-        onRefresh = { onRefresh.invoke() },
-    ) {
-        LazyColumn (modifier = Modifier.fillMaxSize()){
-            items(groups) { group ->
-                ListItem(
-                    modifier = modifier.clickable(onClick = { onClick(Expenses.route) }),
-                    headlineContent = { Text(group.name) },
-                    trailingContent = { Debt(amount = "10€", owes = true) },
-                )
-            }
+    LazyColumn(modifier = Modifier.fillMaxSize()) {
+        items(groups) { group ->
+            ListItem(
+                modifier = modifier.clickable(onClick = { onClick(Expenses.route) }),
+                headlineContent = { Text(group.name) },
+                trailingContent = { Debt(amount = "10€", owes = true) },
+            )
         }
+
     }
 }

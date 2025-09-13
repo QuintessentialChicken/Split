@@ -7,7 +7,9 @@ import com.example.split.data.Group
 import com.example.split.data.UsersRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -17,16 +19,6 @@ class GroupsViewModel @Inject constructor(
     private val userRepo: UsersRepository
 ) : ViewModel() {
 
-    private val _groups = MutableStateFlow<List<Group>>(emptyList())
-    val groups: StateFlow<List<Group>> = _groups
+    val groups: StateFlow<List<Group>> = expensesRepo.getGroupsFlow("A2zZCcXnbNy1iQVdcKA8", false).stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
-    fun loadGroups(userId: String) {
-        println("REFRESHING GROUPS")
-        viewModelScope.launch {
-            val result = expensesRepo.getGroupsByUserId(userId)
-            _groups.value = result
-        }.invokeOnCompletion {
-            println(_groups.value)
-        }
-    }
 }
