@@ -85,7 +85,6 @@ fun ExpensesScreen(
     setFab: (FabState?) -> Unit,
     setTopBar: (TopBarState?) -> Unit
 ) {
-    val expenses by viewModel.expenses.collectAsState()
     LaunchedEffect(Unit) {
         setFab(
             FabState(
@@ -97,7 +96,7 @@ fun ExpensesScreen(
 
     BackHandler(enabled = viewModel.currentUiState == UiState.ADD) { viewModel.handleBackPress() }
 
-//    val expenses by viewModel.expenses.collectAsState(initial = emptyList())
+    val expenses by viewModel.uiExpenses.collectAsState(initial = emptyList())
     Column(
         modifier
             .fillMaxSize()
@@ -122,7 +121,7 @@ fun ExpensesScreen(
                 LazyColumn {
                     var lastDate = "Jun 1970"
                     items(expenses) { expense ->
-                        val currentDate = millisToDateString(expense.date, "MMMM yyyy")
+                        val currentDate = millisToDateString(expense.paidOn, "MMMM yyyy")
                         if (currentDate != lastDate) {
                             Row(
                                 modifier = Modifier
@@ -152,13 +151,13 @@ fun ExpensesScreen(
                                 )
                             }
                         }
-//                        val payer = if (expense.owes) expense.paidBy + "hat" else "Du hast"
+                        val payer = if (expense.owes) expense.paidBy + " hat" else "Du hast"
                         ListItem(
                             headlineContent = { Text(expense.title) },
-//                            supportingContent = { Text("$payer ${expense.amountPaid} gezahlt") },
-                            leadingContent = { DateIcon(timestamp = expense.date) },
+                            supportingContent = { Text("$payer ${expense.amountPaid} gezahlt") },
+                            leadingContent = { DateIcon(timestamp = expense.paidOn) },
                             trailingContent = {
-//                                Debt(amount = expense.amountOwed, owes = expense.owes)
+                                Debt(amount = expense.amountOwed, owes = expense.owes)
                             },
                         )
                         lastDate = currentDate

@@ -36,6 +36,7 @@ class FirestoreStorageServiceImpl @Inject constructor(
             println("ASDASDAS")
             return null
         }
+        println(id)
         val result = usersRef.document(id).get().await()
         return result.toObject<User>()
     }

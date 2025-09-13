@@ -11,7 +11,8 @@ data class Expense(
     val currencyCode: String = "",
     val date: Long = 0,
     val paidByUserId: String = "",
-    val groupId: String? = null  // null if not part of a group
+    val groupId: String? = null,  //null if not part of a group
+    val participants: Map<String, Float> = emptyMap()
 )
 
 data class Group(

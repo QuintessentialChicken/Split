@@ -17,13 +17,16 @@ import com.example.split.utils.formatCurrency
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import javax.inject.Inject
-
+import kotlin.collections.map
+import kotlin.math.absoluteValue
+import kotlin.math.roundToInt
 
 
 data class UserBalance(
@@ -70,14 +73,27 @@ class ExpensesViewModel @Inject constructor(
             _balance = value
         }
 
-    var _uiExpenses by mutableStateOf<List<UIExpense>>(emptyList())
-    var uiExpenses: List<UIExpense>
-        get() = _uiExpenses
-        set(value) {
-            _uiExpenses = value
-        }
+    val uiExpenses: StateFlow<List<UIExpense>> = expensesRepo.getExpensesByGroup("A2zZCcXnbNy1iQVdcKA8")
+        .map { expenses ->
+            val currentUser = userRepo.getCurrentUserId()
+            expenses.map { expense ->
+                val paidByCurrentUser = expense.paidByUserId == userRepo.getCurrentUserId()
+                println(expense.participants)
+                println(currentUser)
+                val amountOwed: Int = (if (paidByCurrentUser) expense.amount - (expense.amount * expense.participants[currentUser]!!) else -expense.amount * expense.participants[currentUser]!!).roundToInt()
 
-    val expenses: StateFlow<List<Expense>> = expensesRepo.getExpensesByGroup("A2zZCcXnbNy1iQVdcKA8").stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
+                UIExpense(
+                    title = expense.title,
+                    paidBy = userRepo.getUserById(expense.paidByUserId)?.name ?: "",
+                    amountPaid = formatCurrency(expense.amount),
+                    amountOwed = formatCurrency(amountOwed.absoluteValue),
+                    owes = amountOwed < 0,
+                    paidOn = expense.date,
+                )
+            }
+        }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
+
 
     private val _options = listOf(User("2", "Paula"), User("3", "Test"))
 
