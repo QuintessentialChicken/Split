@@ -1,7 +1,9 @@
 package com.example.split.navigation
 
 import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavType
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import com.example.split.SplitAppState
 import com.example.split.ui.screens.AccountScreen
 import com.example.split.ui.screens.friends.FriendsScreen
@@ -14,15 +16,17 @@ fun NavGraphBuilder.setupNavGraph(
     composable(Groups.route) {
         appState.fabState.value = null
         GroupsScreen(
-            navigate = { route -> appState.navigate(route) },
+            navigate = { route, id -> appState.navigate("${route}/${id}") },
             setTopBar = { appState.topBarState.value = it }
         )
     }
 
-    composable(Friends.route) {
+    composable(
+        route = Friends.route,
+    ) {
         appState.fabState.value = null
         FriendsScreen(
-            navigate = { route -> appState.navigate(route) },
+            navigate = { route, id -> appState.navigate("${route}/${id}") },
             setTopBar = { appState.topBarState.value = it }
         )
     }
@@ -33,7 +37,10 @@ fun NavGraphBuilder.setupNavGraph(
         AccountScreen()
     }
 
-    composable(Expenses.route) {
+    composable(
+        route = Expenses.routeWithArgs,
+        arguments = listOf(navArgument("groupId") { type = NavType.StringType })
+    ) {
         ExpensesScreen(
             setFab = { appState.fabState.value = it },
             setTopBar = { appState.topBarState.value = it }

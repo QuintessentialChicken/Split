@@ -52,8 +52,9 @@ class FriendsViewModel @Inject constructor(
             if (friend != null && currentUser != null) {
                 expensesRepo.addGroup(
                     Group(
-                        friend.name,
-                        listOf(currentUser.name, friend.name)
+                        name = friend.name,
+                        members = listOf(currentUser.name, friend.name),
+                        memberCount = 2
                     )
                 )
             }

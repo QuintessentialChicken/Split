@@ -72,15 +72,18 @@ class FirestoreStorageServiceImpl @Inject constructor(
     override fun getGroupsFlow(id: String, isFriend: Boolean): Flow<List<Group>> = callbackFlow {
         val ref = if (!isFriend) groupsRef.whereGreaterThan("memberCount", 2) else groupsRef.whereLessThanOrEqualTo("memberCount", 2)
         val registration = ref.addSnapshotListener { snapshot, e ->
-                if (e != null) {
-                    Log.w(TAG, "Listen failed.", e)
-                    close(e)
-                    return@addSnapshotListener
-                }
-
-                val groups = snapshot?.toObjects(Group::class.java) ?: emptyList()
-                trySend(groups)
+            if (e != null) {
+                Log.w(TAG, "Listen failed.", e)
+                close(e)
+                return@addSnapshotListener
             }
+
+            val groups = snapshot?.documents?.map { doc ->
+                val group = doc.toObject(Group::class.java)!!
+                group.copy(id = doc.id)
+            } ?: emptyList()
+            trySend(groups)
+        }
         awaitClose { registration.remove() }
     }
 

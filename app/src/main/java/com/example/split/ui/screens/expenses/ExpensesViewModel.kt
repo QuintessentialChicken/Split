@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.split.data.Expense
@@ -43,7 +44,6 @@ data class UIExpense(
     val owes: Boolean,
     val paidOn: Long,
 )
-
 data class ExpensesUiState(
     val expenses: List<UIExpense>,
     val totalOwed: Int
@@ -52,13 +52,17 @@ data class ExpensesUiState(
 @HiltViewModel
 class ExpensesViewModel @Inject constructor(
     private val expensesRepo: ExpensesRepository,
-    private val userRepo: UsersRepository
+    private val userRepo: UsersRepository,
+    savedStateHandle: SavedStateHandle
 ) : ViewModel() {
     enum class UiState {
         HOME,
         ADD
     }
 
+    val groupId: String = checkNotNull(savedStateHandle["groupId"])
+
+    init {println(groupId)}
     val userId = "1" // TODO Replace with actual userId
 
     private var _currentUiState by mutableStateOf(UiState.HOME)
@@ -72,30 +76,41 @@ class ExpensesViewModel @Inject constructor(
     var selectedUsers = mutableListOf<User>()
     var payer = User("-1", "")
 
-    val expensesUiState: StateFlow<ExpensesUiState> = expensesRepo.getExpensesByGroup("A2zZCcXnbNy1iQVdcKA8")
+    val expensesUiState: StateFlow<ExpensesUiState> = expensesRepo.getExpensesByGroup(groupId)
         .map { expenses ->
             val currentUser = userRepo.getCurrentUserId()
             var total = 0
 
             val uiList = expenses.map { expense ->
                 val share = expense.participants[currentUser] ?: 0.0f
-                val paidByCurrentUser = expense.paidByUserId == userRepo.getCurrentUserId()
-                val rawAmountOwed = if (paidByCurrentUser) {
-                    expense.amount - (expense.amount * share)
+                if (share <= 0) {
+                    UIExpense(
+                        title = expense.title,
+                        paidBy = userRepo.getUserById(expense.paidByUserId)?.name ?: "",
+                        amountPaid = formatCurrency(expense.amount),
+                        amountOwed = "",
+                        owes = false,
+                        paidOn = expense.date,
+                    )
                 } else {
-                    -expense.amount * share
-                }
-                val amountOwed = rawAmountOwed.roundToInt()
-                total += amountOwed
+                    val paidByCurrentUser = expense.paidByUserId == userRepo.getCurrentUserId()
+                    val rawAmountOwed = if (paidByCurrentUser) {
+                        expense.amount - (expense.amount * share)
+                    } else {
+                        -expense.amount * share
+                    }
+                    val amountOwed = rawAmountOwed.roundToInt()
+                    total += amountOwed
 
-                UIExpense(
-                    title = expense.title,
-                    paidBy = userRepo.getUserById(expense.paidByUserId)?.name ?: "",
-                    amountPaid = formatCurrency(expense.amount),
-                    amountOwed = formatCurrency(amountOwed.absoluteValue),
-                    owes = amountOwed < 0,
-                    paidOn = expense.date,
-                )
+                    UIExpense(
+                        title = expense.title,
+                        paidBy = userRepo.getUserById(expense.paidByUserId)?.name ?: "",
+                        amountPaid = formatCurrency(expense.amount),
+                        amountOwed = formatCurrency(amountOwed.absoluteValue),
+                        owes = amountOwed < 0,
+                        paidOn = expense.date,
+                    )
+                }
             }
 
             ExpensesUiState(

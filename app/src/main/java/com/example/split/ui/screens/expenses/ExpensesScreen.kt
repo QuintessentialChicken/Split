@@ -77,7 +77,6 @@ import com.example.split.utils.DigitOnlyInputTransformation
 import com.example.split.utils.formatCurrency
 import com.example.split.utils.millisToDateString
 import kotlin.math.absoluteValue
-import kotlin.math.exp
 
 
 @OptIn(ExperimentalSharedTransitionApi::class, ExperimentalMaterial3Api::class)
@@ -86,7 +85,7 @@ fun ExpensesScreen(
     modifier: Modifier = Modifier,
     viewModel: ExpensesViewModel = hiltViewModel(),
     setFab: (FabState?) -> Unit,
-    setTopBar: (TopBarState?) -> Unit
+    setTopBar: (TopBarState?) -> Unit,
 ) {
     BackHandler(enabled = viewModel.currentUiState == UiState.ADD) { viewModel.handleBackPress() }
 
@@ -152,7 +151,7 @@ fun ExpensesScreen(
                             supportingContent = { Text("$payer ${expense.amountPaid} gezahlt") },
                             leadingContent = { DateIcon(timestamp = expense.paidOn) },
                             trailingContent = {
-                                Debt(amount = expense.amountOwed, owes = expense.owes)
+                                if (expense.amountOwed.isEmpty()) Text("Du bist nicht beteiligt") else Debt(amount = expense.amountOwed, owes = expense.owes)
                             },
                         )
                         lastDate = currentDate
@@ -206,7 +205,7 @@ fun AddExpense(
     var showDatePicker by remember { mutableStateOf(false) }
     var searchExpanded by remember { mutableStateOf(false) }
     var showUserPicker by remember { mutableStateOf(true) }
-    var showGroupPicker by remember { mutableStateOf(true) }
+    var showGroupPicker by remember { mutableStateOf(false) }
 
     LaunchedEffect(chipEntryState.text) {
         onChipInput(chipEntryState.text.toString())
@@ -356,37 +355,38 @@ fun AddExpense(
             }
         }
     }
-    val groups = listOf("Group1", "Group2")
-    if (showGroupPicker) {
-        val group: Group = Group("", listOf())
-
-        Dialog({
-            showGroupPicker = false
-            onAddGroup.invoke(group)
-        }) {
-            Column (
-                modifier = Modifier
-                    .clip(RoundedCornerShape(10.dp, 10.dp, 10.dp, 10.dp))
-                    .background(MaterialTheme.colorScheme.surface)
-            ) {
-                var selectedIndex by remember { mutableIntStateOf(0) }
-
-                groups.forEachIndexed { index, user ->
-                    ListItem(
-                        modifier = Modifier.clickable(onClick = {
-                            group.name = user
-                            group.members = listOf<String>("Leon", user)
-                        }),
-                        headlineContent = { Text(user) },
-                        leadingContent = { Icon(Icons.Default.Person, "Person") },
-                        trailingContent = {
-                            if (index == selectedIndex) {
-                                Icon(Icons.Default.Done, "Selected")
-                            }
-                        }
-                    )
-                }
-
-            }        }
-    }
+//    val groups = listOf("Group1", "Group2")
+//    if (showGroupPicker) {
+//        val group: Group = Group("", listOf())
+//
+//        Dialog({
+//            showGroupPicker = false
+//            onAddGroup.invoke(group)
+//        }) {
+//            Column (
+//                modifier = Modifier
+//                    .clip(RoundedCornerShape(10.dp, 10.dp, 10.dp, 10.dp))
+//                    .background(MaterialTheme.colorScheme.surface)
+//            ) {
+//                var selectedIndex by remember { mutableIntStateOf(0) }
+//
+//                groups.forEachIndexed { index, user ->
+//                    ListItem(
+//                        modifier = Modifier.clickable(onClick = {
+//                            group.name = user
+//                            group.members = listOf<String>("Leon", user)
+//                        }),
+//                        headlineContent = { Text(user) },
+//                        leadingContent = { Icon(Icons.Default.Person, "Person") },
+//                        trailingContent = {
+//                            if (index == selectedIndex) {
+//                                Icon(Icons.Default.Done, "Selected")
+//                            }
+//                        }
+//                    )
+//                }
+//
+//            }
+//            }
+//    }
 }

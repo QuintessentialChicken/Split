@@ -46,13 +46,13 @@ fun DateIcon(
 @Composable
 fun GroupLazyList(
     modifier: Modifier = Modifier,
-    onClick: (route: String) -> Unit,
+    onClick: (route: String, groupId: String) -> Unit,
     groups: List<Group>
 ) {
     LazyColumn(modifier = Modifier.fillMaxSize()) {
         items(groups) { group ->
             ListItem(
-                modifier = modifier.clickable(onClick = { onClick(Expenses.route) }),
+                modifier = modifier.clickable(onClick = { onClick(Expenses.route, group.id) }),
                 headlineContent = { Text(group.name) },
                 trailingContent = { Debt(amount = "10€", owes = true) },
             )

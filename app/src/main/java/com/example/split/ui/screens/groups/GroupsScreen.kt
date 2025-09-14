@@ -23,7 +23,7 @@ import com.example.split.ui.components.GroupLazyList
 fun GroupsScreen(
     modifier: Modifier = Modifier,
     viewModel: GroupsViewModel = hiltViewModel(),
-    navigate: (String) -> Unit,
+    navigate: (String, String) -> Unit,
     setTopBar: (TopBarState?) -> Unit
 ) {
     setTopBar(TopBarState(title = "Groups", actionIcon = IconWrapper(Icons.Default.GroupAdd, contentDescription = "Add a Friend", {})))
@@ -31,7 +31,7 @@ fun GroupsScreen(
     val groups by viewModel.groups.collectAsState(initial = emptyList())
 
     GroupLazyList(
-        onClick = { navigate(it) },
+        onClick = { route, id -> navigate(route, id) },
         groups = groups,
     )
 }

@@ -45,7 +45,7 @@ import com.example.split.ui.screens.friends.FriendsViewModel.UiState
 fun FriendsScreen(
     modifier: Modifier = Modifier,
     viewModel: FriendsViewModel = hiltViewModel(),
-    navigate: (String) -> Unit,
+    navigate: (String, String) -> Unit,
     setTopBar: (TopBarState?) -> Unit
 ) {
     val friends by viewModel.friends.collectAsState(initial = emptyList())
@@ -60,7 +60,7 @@ fun FriendsScreen(
             )
 
             GroupLazyList(
-                onClick = { navigate(it) },
+                onClick = { route, id -> navigate(route, id) },
                 groups = friends,
             )
         }

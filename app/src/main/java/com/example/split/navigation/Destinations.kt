@@ -31,4 +31,7 @@ object Expenses : Destinations {
         get() = "expenses_route"
     override val title: String
         get() = "Expenses"
+    const val groupIdArg = "groupId"
+    val routeWithArgs: String
+        get() = "$route/{$groupIdArg}"
 }
