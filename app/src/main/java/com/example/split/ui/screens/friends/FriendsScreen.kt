@@ -33,6 +33,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.split.FabState
 import com.example.split.IconWrapper
 import com.example.split.TopBarState
 import com.example.split.navigation.Expenses
@@ -46,10 +47,11 @@ fun FriendsScreen(
     modifier: Modifier = Modifier,
     viewModel: FriendsViewModel = hiltViewModel(),
     navigate: (String, String) -> Unit,
-    setTopBar: (TopBarState?) -> Unit
+    setTopBar: (TopBarState?) -> Unit,
+    setFab: (FabState?) -> Unit,
 ) {
     val friends by viewModel.friends.collectAsState(initial = emptyList())
-
+    setFab(null)
     when (viewModel.currentUiState) {
         UiState.HOME -> {
             setTopBar(

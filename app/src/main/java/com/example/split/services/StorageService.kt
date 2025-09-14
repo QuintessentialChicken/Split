@@ -17,6 +17,8 @@ interface StorageService {
 
     suspend fun getGroupsByUserId(id: String): List<Group>
 
+    suspend fun getGroup(id: String): Group?
+
     fun getGroupsFlow(id: String, isFriend: Boolean): Flow<List<Group>>
     suspend fun getFriendsByUserId(id: String): List<Group>
     fun getExpensesFlow(groupId: String): Flow<List<Expense>>

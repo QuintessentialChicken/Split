@@ -176,7 +176,7 @@ fun ExpensesScreen(
                 AddExpense(
                     title = title,
                     amount = amount,
-                    viewModel.filteredOptions,
+                    filteredOptions = viewModel.filteredOptions,
                     onDateSelected = { viewModel.selectedDate = it },
                     onUserAdded = { viewModel.selectedUsers.add(it) },
                     onChipInput = { viewModel.filterText(it) },
@@ -204,7 +204,7 @@ fun AddExpense(
     var chipEntryState = rememberTextFieldState()
     var showDatePicker by remember { mutableStateOf(false) }
     var searchExpanded by remember { mutableStateOf(false) }
-    var showUserPicker by remember { mutableStateOf(true) }
+    var showUserPicker by remember { mutableStateOf(false) }
     var showGroupPicker by remember { mutableStateOf(false) }
 
     LaunchedEffect(chipEntryState.text) {

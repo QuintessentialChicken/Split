@@ -14,27 +14,28 @@ fun NavGraphBuilder.setupNavGraph(
     appState: SplitAppState
 ) {
     composable(Groups.route) {
-        appState.fabState.value = null
         GroupsScreen(
             navigate = { route, id -> appState.navigate("${route}/${id}") },
-            setTopBar = { appState.topBarState.value = it }
+            setTopBar = { appState.topBarState.value = it },
+            setFab = { appState.fabState.value = it }
         )
     }
 
     composable(
         route = Friends.route,
     ) {
-        appState.fabState.value = null
         FriendsScreen(
             navigate = { route, id -> appState.navigate("${route}/${id}") },
-            setTopBar = { appState.topBarState.value = it }
+            setTopBar = { appState.topBarState.value = it },
+            setFab = { appState.fabState.value = it }
         )
     }
 
     composable(Account.route) {
-        appState.fabState.value = null
-        appState.topBarState.value = null
-        AccountScreen()
+        AccountScreen(
+            setTopBar = { appState.topBarState.value = it },
+            setFab = { appState.fabState.value = it }
+        )
     }
 
     composable(
@@ -42,8 +43,8 @@ fun NavGraphBuilder.setupNavGraph(
         arguments = listOf(navArgument("groupId") { type = NavType.StringType })
     ) {
         ExpensesScreen(
-            setFab = { appState.fabState.value = it },
-            setTopBar = { appState.topBarState.value = it }
+            setFab = { appState.setFabState(it) },
+            setTopBar = { appState.topBarState.value = it },
         )
     }
 }

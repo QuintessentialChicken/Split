@@ -62,7 +62,6 @@ class ExpensesViewModel @Inject constructor(
 
     val groupId: String = checkNotNull(savedStateHandle["groupId"])
 
-    init {println(groupId)}
     val userId = "1" // TODO Replace with actual userId
 
     private var _currentUiState by mutableStateOf(UiState.HOME)
@@ -104,7 +103,7 @@ class ExpensesViewModel @Inject constructor(
 
                     UIExpense(
                         title = expense.title,
-                        paidBy = userRepo.getUserById(expense.paidByUserId)?.name ?: "",
+                        paidBy = userRepo.getUserById(expense.paidByUserId)?.name ?: "Irgendwer",
                         amountPaid = formatCurrency(expense.amount),
                         amountOwed = formatCurrency(amountOwed.absoluteValue),
                         owes = amountOwed < 0,
@@ -119,7 +118,7 @@ class ExpensesViewModel @Inject constructor(
             )
         }.stateIn(viewModelScope, SharingStarted.Eagerly, ExpensesUiState(emptyList(), 0))
 
-    private val _options = listOf(User("2", "Paula"), User("3", "Test"))
+    private val _options = listOf(User("n5b4ynsiVNS7Es7ySSQcPqQSYlC3", "Leon"), User("xygiLHlCOVTjfe2KEjnX6zVvzdk2", "Paula"))
 
     private var _filteredOptions = mutableStateListOf<User>()
     var filteredOptions: SnapshotStateList<User>
@@ -158,9 +157,10 @@ class ExpensesViewModel @Inject constructor(
                     amount = amount.text.toString().toInt(),
                     currencyCode = "EUR",
                     date = date,
-                    paidByUserId = userId
+                    paidByUserId = "xygiLHlCOVTjfe2KEjnX6zVvzdk2",
+                    participants = mapOf("n5b4ynsiVNS7Es7ySSQcPqQSYlC3" to 0.5f, "xygiLHlCOVTjfe2KEjnX6zVvzdk2" to 0.5f)
                 ),
-                "1"
+                "A2zZCcXnbNy1iQVdcKA8"
             )
             selectedDate = null
             selectedUsers.clear()

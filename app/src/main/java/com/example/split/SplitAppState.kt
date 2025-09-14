@@ -18,7 +18,12 @@ import com.example.split.navigation.Groups
 class SplitAppState(
     val navController: NavHostController,
 ) {
-    val fabState = mutableStateOf<FabState?>(null)
+    var fabState = mutableStateOf<FabState?>(null)
+
+    fun setFabState(state: FabState?) {
+        println("Setting state: $state")
+        fabState.value = state
+    }
     val topBarState = mutableStateOf<TopBarState?>(null)
     var currentScreen: Destinations = Groups
 

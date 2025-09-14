@@ -36,7 +36,6 @@ class FirestoreStorageServiceImpl @Inject constructor(
             println("ASDASDAS")
             return null
         }
-        println(id)
         val result = usersRef.document(id).get().await()
         return result.toObject<User>()
     }
@@ -57,7 +56,7 @@ class FirestoreStorageServiceImpl @Inject constructor(
         expense: Expense,
         groupId: String
     ) {
-        TODO("Not yet implemented")
+        groupsRef.document(groupId).collection("expenses").document().set(expense)
     }
 
     override suspend fun getGroupsByUserId(id: String): List<Group> {
@@ -67,6 +66,11 @@ class FirestoreStorageServiceImpl @Inject constructor(
             .get()
             .await()
         return groups.toObjects<Group>()
+    }
+
+    override suspend fun getGroup(id: String): Group? {
+        val group = groupsRef.document(id).get().await()
+        return group.toObject<Group>()?.copy(id = id)
     }
 
     override fun getGroupsFlow(id: String, isFriend: Boolean): Flow<List<Group>> = callbackFlow {

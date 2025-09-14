@@ -39,6 +39,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -78,7 +79,9 @@ class MainActivity : ComponentActivity() {
         setContent {
             SplitTheme {
                 val appState = rememberAppState()
-
+                LaunchedEffect(appState.fabState) {
+                    println("FabState: ${appState.fabState}")
+                }
                 Scaffold(
                     modifier = appState.topBarState.value?.scrollBehavior?.let { scrollBehavior -> Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)} ?: Modifier,
                     containerColor = MaterialTheme.colorScheme.surface,
