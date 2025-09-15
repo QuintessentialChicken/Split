@@ -27,7 +27,7 @@ class UsersRepository @Inject constructor(
 ) {
     fun getCurrentUserId(): String = auth.currentUserId
     suspend fun addUser(user: User) = firestore.addUser(auth.currentUserId, user)
-    suspend fun getCurrentUser(): User? = firestore.getUserById("2")
+    suspend fun getCurrentUser(): User? = firestore.getUserById(auth.currentUserId)
     suspend fun getUserById(id: String): User? = firestore.getUserById(id)
     suspend fun getUserByFriendCode(code: String): User? = firestore.getUserByFriendCode(code)
 }

@@ -160,7 +160,7 @@ class ExpensesViewModel @Inject constructor(
                     paidByUserId = "xygiLHlCOVTjfe2KEjnX6zVvzdk2",
                     participants = mapOf("n5b4ynsiVNS7Es7ySSQcPqQSYlC3" to 0.5f, "xygiLHlCOVTjfe2KEjnX6zVvzdk2" to 0.5f)
                 ),
-                "A2zZCcXnbNy1iQVdcKA8"
+                groupId
             )
             selectedDate = null
             selectedUsers.clear()

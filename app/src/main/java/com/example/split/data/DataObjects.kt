@@ -1,6 +1,7 @@
 package com.example.split.data
 
 data class User(
+    val id: String = "",
     val name: String = "",
     val friendCode: String = "",
 )

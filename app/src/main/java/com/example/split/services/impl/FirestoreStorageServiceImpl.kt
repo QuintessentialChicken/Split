@@ -33,11 +33,11 @@ class FirestoreStorageServiceImpl @Inject constructor(
 
     override suspend fun getUserById(id: String): User? {
         if (id == "") {
-            println("ASDASDAS")
+            Log.e("StorageService", "Error: ID can't be empty when retrieving User")
             return null
         }
         val result = usersRef.document(id).get().await()
-        return result.toObject<User>()
+        return result.toObject<User>()?.copy(id = id)
     }
 
     override suspend fun getUserByFriendCode(code: String): User? {
@@ -45,7 +45,7 @@ class FirestoreStorageServiceImpl @Inject constructor(
             .whereEqualTo("friendCode", code)
             .get()
             .await()
-        return if (users.isEmpty) null else users.first().toObject<User>()
+        return if (users.isEmpty) null else users.first().toObject<User>().copy(id = users.first().id)
     }
 
     override suspend fun addGroup(group: Group) {
@@ -75,7 +75,7 @@ class FirestoreStorageServiceImpl @Inject constructor(
 
     override fun getGroupsFlow(id: String, isFriend: Boolean): Flow<List<Group>> = callbackFlow {
         val ref = if (!isFriend) groupsRef.whereGreaterThan("memberCount", 2) else groupsRef.whereLessThanOrEqualTo("memberCount", 2)
-        val registration = ref.addSnapshotListener { snapshot, e ->
+        val registration = ref.whereArrayContains("members", id).addSnapshotListener { snapshot, e ->
             if (e != null) {
                 Log.w(TAG, "Listen failed.", e)
                 close(e)

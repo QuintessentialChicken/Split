@@ -35,8 +35,7 @@ class FriendsViewModel @Inject constructor(
             _currentUiState = value
         }
 
-    val friends: StateFlow<List<Group>> = expensesRepo.getGroupsFlow("A2zZCcXnbNy1iQVdcKA8", true).stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
-
+    val friends: StateFlow<List<Group>> = expensesRepo.getGroupsFlow(userRepo.getCurrentUserId(), true).stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
     fun DEBUG_AddUser() {
         viewModelScope.launch { userRepo.addUser(User("Paula", "ABCDFGHI")) }
@@ -53,7 +52,7 @@ class FriendsViewModel @Inject constructor(
                 expensesRepo.addGroup(
                     Group(
                         name = friend.name,
-                        members = listOf(currentUser.name, friend.name),
+                        members = listOf(currentUser.id, friend.id),
                         memberCount = 2
                     )
                 )
